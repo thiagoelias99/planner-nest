@@ -22,6 +22,7 @@ model User {
   Address     UserAddress    @relation(fields: [userAddressId], references: [id])
   Preferences UserPreference @relation(fields: [userPreferenceId], references: [id])
   ToDos       ToDo[]
+  StockOrders StockOrder[]
 
   @@map("users")
 }
@@ -64,4 +65,56 @@ model ToDo {
   User User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   @@map("todos")
+}
+
+model Stock {
+  id               String   @id @default(uuid())
+  ticker           String   @unique
+  name             String
+  typeId           String   @map("type_id")
+  price            Decimal  @db.Decimal(10, 2)
+  latestTradingDay DateTime @map("latest_trading_day")
+  open             Decimal  @db.Decimal(10, 2)
+  changePercent    Decimal  @map("change_percent") @db.Decimal(10, 2)
+
+  StockType   StockType    @relation(fields: [typeId], references: [id])
+  StockOrders StockOrder[]
+
+  @@map("stocks")
+}
+
+model StockType {
+  id   String @id @default(uuid())
+  name String @unique
+
+  Stocks Stock[]
+
+  @@map("stock_types")
+}
+
+model StockOrder {
+  id                     String   @id @default(uuid())
+  stockId                String   @map("stock_id")
+  orderTypeId            String?  @map("order_type_id")
+  userId                 String   @map("user_id")
+  quantity               Int
+  price                  Decimal  @db.Decimal(10, 2)
+  previousStockMeanValue Decimal? @map("previous_stock_mean_value")
+  newStockMeanValue      Decimal? @map("new_stock_mean_value")
+  createdAt              DateTime @map("created_at")
+
+  Stock     Stock      @relation(fields: [stockId], references: [id])
+  OrderType OrderType? @relation(fields: [orderTypeId], references: [id])
+  User      User       @relation(fields: [userId], references: [id])
+
+  @@map("stock_orders")
+}
+
+model OrderType {
+  id   String @id @default(uuid())
+  name String @unique
+
+  StockOrder StockOrder[]
+
+  @@map("order_types")
 }

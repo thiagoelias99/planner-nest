@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_INTERCEPTOR } from '@nestjs/core'
 import { TodosModule } from './resources/todos/todos.module'
+import { StocksModule } from './resources/stocks/stocks.module'
 
 @Module({
   imports:
@@ -26,7 +27,8 @@ import { TodosModule } from './resources/todos/todos.module'
         inject: [ConfigService],
         global: true,
       }),
-      TodosModule
+      TodosModule,
+      StocksModule
     ],
   controllers: [AppController],
   providers: [
