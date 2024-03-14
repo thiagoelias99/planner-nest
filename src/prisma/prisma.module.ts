@@ -5,7 +5,7 @@ import { PrismaUserRepository } from './repositories/User/prisma-users.repositor
 import { UsersRepository } from '../resources/users/users.repository'
 import { TodosRepository } from '../resources/todos/todos.repository'
 import { PrismaTodosRepository } from './repositories/Todo/prisma-todos.repository'
-import { StocksRepository } from 'src/resources/stocks/stocks.repository.js'
+import { StocksRepository } from '../resources/stocks/stocks.repository.js'
 import { PrismaStocksRepository } from './repositories/Stock/prisma-stocks.repository.js'
 
 @Module({

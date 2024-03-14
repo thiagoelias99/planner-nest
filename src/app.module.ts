@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_INTERCEPTOR } from '@nestjs/core'
 import { TodosModule } from './resources/todos/todos.module'
 import { StocksModule } from './resources/stocks/stocks.module'
+import { CeiCsvUploadModule } from './resources/cei-csv-upload/cei-csv-upload.module'
 
 @Module({
   imports:
@@ -28,7 +29,8 @@ import { StocksModule } from './resources/stocks/stocks.module'
         global: true,
       }),
       TodosModule,
-      StocksModule
+      StocksModule,
+      CeiCsvUploadModule
     ],
   controllers: [AppController],
   providers: [
