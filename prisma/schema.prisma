@@ -71,13 +71,13 @@ model Stock {
   id               String   @id @default(uuid())
   ticker           String   @unique
   name             String
-  typeId           String   @map("type_id")
+  type           String   @map("type_id")
   price            Decimal  @db.Decimal(10, 2)
   latestTradingDay DateTime @map("latest_trading_day")
   open             Decimal  @db.Decimal(10, 2)
   changePercent    Decimal  @map("change_percent") @db.Decimal(10, 2)
 
-  StockType   StockType    @relation(fields: [typeId], references: [id])
+  StockType   StockType    @relation(fields: [type], references: [name])
   StockOrders StockOrder[]
 
   @@map("stocks")

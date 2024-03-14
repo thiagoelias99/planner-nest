@@ -1,26 +1,21 @@
 import { Injectable } from '@nestjs/common'
 import { CreateStockDto } from './dto/create-stock.dto'
-import { UpdateStockDto } from './dto/update-stock.dto'
+import { StocksRepository } from './stocks.repository'
+import { Stock } from './stock.entity'
 
 @Injectable()
 export class StocksService {
-  create(createStockDto: CreateStockDto) {
-    return 'This action adds a new stock'
+  constructor(private readonly stockRepository: StocksRepository){}
+
+  async findStockByTicker(ticker: string): Promise<Stock | null>{
+    return this.stockRepository.findStockByTicker(ticker)
   }
 
-  findAll() {
-    return 'This action returns all stocks'
+  async createStock(createStockDto: CreateStockDto): Promise<string> {
+    return this.stockRepository.createStock(createStockDto)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} stock`
-  }
-
-  update(id: number, updateStockDto: UpdateStockDto) {
-    return `This action updates a #${id} stock`
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} stock`
+  async getStockTypes(): Promise<string[]> {
+    return this.stockRepository.getStockTypes()
   }
 }
