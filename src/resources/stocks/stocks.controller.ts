@@ -1,8 +1,9 @@
-import { Controller, Post, Body } from '@nestjs/common'
+import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common'
 import { StocksService } from './stocks.service'
 import { CreateStockDto } from './dto/create-stock.dto'
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Stock } from './stock.entity'
+import { AuthGuard, UserRequest } from 'src/guards/auth.guard'
 
 @Controller('stocks')
 @ApiTags('Stocks')
@@ -10,13 +11,16 @@ export class StocksController {
   constructor(private readonly stocksService: StocksService) { }
 
   @Post()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new stock' })
   @ApiResponse({
     status: 201,
     description: 'Created',
     type: Stock,
   })
-  create(@Body() createStockDto: CreateStockDto) {
+  create(@Req() req: UserRequest, @Body() createStockDto: CreateStockDto) {
+    // const { id: userId } = req.user
     // return this.stocksService.createStock(createStockDto)
     return createStockDto
   }

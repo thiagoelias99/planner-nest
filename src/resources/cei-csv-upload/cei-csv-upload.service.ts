@@ -6,12 +6,12 @@ import { StocksService } from '../stocks/stocks.service'
 export class CeiCsvUploadService {
   constructor(private readonly stockService: StocksService) { }
 
-  async addOrders(data: CsvItem[]) {
+  async addOrders(data: CsvItem[], userId: string) {
     // Filter only the stocks that are in liquidation
     const allStocks = data.filter((item) => item?.category === CsvItemCategoryEnum.LIQUIDATION)
 
     return this.stockService.addStockOrders({
-      userId: '82e2a8a9-00cc-498d-9225-4de92752fd9c',
+      userId,
       orders: allStocks.map((item) => {
         if (!item) return
 

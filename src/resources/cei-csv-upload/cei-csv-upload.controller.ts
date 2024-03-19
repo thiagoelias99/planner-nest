@@ -1,9 +1,10 @@
-import { Controller, Post, UseInterceptors, UploadedFile, HttpCode } from '@nestjs/common'
+import { Controller, Post, UseInterceptors, UploadedFile, HttpCode, UseGuards, Req } from '@nestjs/common'
 import { CeiCsvUploadService } from './cei-csv-upload.service'
-import { ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { FileUploadDto } from './dto/file-upload.dto'
 import { CsvItem, CsvItemCategoryEnum, CsvItemTypeEnum } from './entities/cei-csv-upload.entity'
+import { AuthGuard, UserRequest } from 'src/guards/auth.guard'
 
 @Controller('cei_upload')
 @ApiTags('CEI csv Upload')
@@ -11,6 +12,8 @@ export class CeiCsvUploadController {
   constructor(private readonly ceiCsvUploadService: CeiCsvUploadService) { }
 
   @Post()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @HttpCode(200)
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Upload a cei exported file' })
@@ -34,7 +37,8 @@ export class CeiCsvUploadController {
       }
     }
   })
-  receive(@UploadedFile() file: Express.Multer.File) {
+  receive(@Req() req: UserRequest, @UploadedFile() file: Express.Multer.File) {
+    const { id: userId } = req.user
     const fileContent = file.buffer.toString('utf8').split('\n')
 
     //Normalize the data from .csv
@@ -60,6 +64,6 @@ export class CeiCsvUploadController {
       return item
     })
 
-    return this.ceiCsvUploadService.addOrders(objects)
+    return this.ceiCsvUploadService.addOrders(objects, userId)
   }
 }
