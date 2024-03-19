@@ -23,6 +23,7 @@ export class IsUniqueStockValidator implements ValidatorConstraintInterface {
       const stock = await this.service.findStockByTicker(value)
       return !stock
     } catch (error) {
+      console.error(error)
       return false
     }
   }

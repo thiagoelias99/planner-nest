@@ -71,7 +71,7 @@ model Stock {
   id               String   @id @default(uuid())
   ticker           String   @unique
   name             String
-  type           String   @map("type_id")
+  type             String   @map("type_id")
   price            Decimal  @db.Decimal(10, 2)
   latestTradingDay DateTime @map("latest_trading_day")
   open             Decimal  @db.Decimal(10, 2)
@@ -94,18 +94,18 @@ model StockType {
 
 model StockOrder {
   id                     String   @id @default(uuid())
-  stockId                String   @map("stock_id")
-  orderTypeId            String?  @map("order_type_id")
+  stockTicker            String   @map("stock_tickers")
+  orderType              String   @map("order_type")
   userId                 String   @map("user_id")
   quantity               Int
   price                  Decimal  @db.Decimal(10, 2)
-  previousStockMeanValue Decimal? @map("previous_stock_mean_value")
-  newStockMeanValue      Decimal? @map("new_stock_mean_value")
+  previousStockMeanValue Decimal? @default(0) @map("previous_stock_mean_value")
+  newStockMeanValue      Decimal? @default(0) @map("new_stock_mean_value")
   createdAt              DateTime @map("created_at")
 
-  Stock     Stock      @relation(fields: [stockId], references: [id])
-  OrderType OrderType? @relation(fields: [orderTypeId], references: [id])
-  User      User       @relation(fields: [userId], references: [id])
+  Stock     Stock     @relation(fields: [stockTicker], references: [ticker])
+  OrderType OrderType @relation(fields: [orderType], references: [name])
+  User      User      @relation(fields: [userId], references: [id])
 
   @@map("stock_orders")
 }
