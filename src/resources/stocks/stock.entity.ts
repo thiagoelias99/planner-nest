@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { faker } from '@faker-js/faker'
+import { Exclude } from 'class-transformer'
 
 export class Stock {
   @ApiProperty({ example: '21f58a70-3d62-4524-b564-3464d85e9e0d' }) id: string
@@ -38,7 +39,7 @@ export class StockList {
 
 export class StocksFromUser extends Stock {
   @ApiProperty({ example: 1 }) quantity: number
-  @ApiProperty({ example: 'Transferência - Liquidação' }) orderGroup: string
+  @Exclude() orderGroup: string
 }
 
 export class StocksFromUserList {

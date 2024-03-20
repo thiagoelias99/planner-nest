@@ -1,8 +1,7 @@
-import { Controller, Post, Body, UseGuards, Req, Get } from '@nestjs/common'
+import { Controller, UseGuards, Req, Get } from '@nestjs/common'
 import { StocksService } from './stocks.service'
-import { CreateStockDto } from './dto/create-stock.dto'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Stock, StocksFromUserList } from './stock.entity'
+import { StocksFromUserList } from './stock.entity'
 import { AuthGuard, UserRequest } from 'src/guards/auth.guard'
 
 @Controller('stocks')
@@ -10,20 +9,20 @@ import { AuthGuard, UserRequest } from 'src/guards/auth.guard'
 export class StocksController {
   constructor(private readonly stocksService: StocksService) { }
 
-  @Post()
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a new stock' })
-  @ApiResponse({
-    status: 201,
-    description: 'Created',
-    type: Stock,
-  })
-  create(@Req() req: UserRequest, @Body() createStockDto: CreateStockDto) {
-    // const { id: userId } = req.user
-    // return this.stocksService.createStock(createStockDto)
-    return createStockDto
-  }
+  // @Post()
+  // @UseGuards(AuthGuard)
+  // @ApiBearerAuth()
+  // @ApiOperation({ summary: 'Create a new stock' })
+  // @ApiResponse({
+  //   status: 201,
+  //   description: 'Created',
+  //   type: Stock,
+  // })
+  // create(@Req() req: UserRequest, @Body() createStockDto: CreateStockDto) {
+  // const { id: userId } = req.user
+  // return this.stocksService.createStock(createStockDto)
+  //   return createStockDto
+  // }
 
   @Get()
   @UseGuards(AuthGuard)
@@ -34,10 +33,15 @@ export class StocksController {
     description: 'Ok',
     type: StocksFromUserList,
   })
-
-  getCurrentStocksFromUser(@Req() req: UserRequest) {
+  async getCurrentStocksFromUser(@Req() req: UserRequest) {
     const { id: userId } = req.user
-    return this.stocksService.getCurrentStocksFromUser(userId)
-    return userId
+    const data = await this.stocksService.getCurrentStocksFromUser(userId)
+
+    // Delete orderGroup
+    data.stocks.forEach(stock => {
+      delete stock.orderGroup
+    })
+
+    return data
   }
 }

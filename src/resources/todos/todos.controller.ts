@@ -39,7 +39,14 @@ export class TodosController {
   })
   async findAll(@Req() req: UserRequest) {
     const { id: userId } = req.user
-    return this.todosService.findAll(userId)
+    const data = await this.todosService.findAll(userId)
+
+    // Delete userId
+    data.items.forEach(todo => {
+      delete todo.userId
+    })
+
+    return data
   }
 
   @Patch()

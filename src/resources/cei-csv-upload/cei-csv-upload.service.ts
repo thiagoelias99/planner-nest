@@ -7,10 +7,9 @@ export class CeiCsvUploadService {
   constructor(private readonly stockService: StocksService) { }
 
   async addOrders(data: CsvItem[], userId: string) {
-    // Filter only the stocks that are in liquidation
+    // Filter only the stock orders that aew related to positions
     const allStocks = data.filter((item) =>
       item?.category === CsvItemCategoryEnum.LIQUIDATION ||
-      // item?.category === CsvItemCategoryEnum.UPDATE ||
       item?.category === CsvItemCategoryEnum.SPREAD ||
       item?.category === CsvItemCategoryEnum.FRACTION ||
       item?.category === CsvItemCategoryEnum.SUBSCRIPTION ||
