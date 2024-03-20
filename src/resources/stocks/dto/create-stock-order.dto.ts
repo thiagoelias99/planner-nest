@@ -10,7 +10,8 @@ export class CreateStockOrderDto {
 interface Order {
   stockTicker: string
   companyName: string
-  orderType: 'BUY' | 'SELL'
+  orderType: 'BUY' | 'SELL',
+  orderGroup: string
   quantity: number
   price: number
   date: Date

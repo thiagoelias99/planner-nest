@@ -56,7 +56,7 @@ export class CeiCsvUploadController {
         ticker,
         institution,
         holder: lineData[4],
-        quantity: Number(lineData[5]),
+        quantity: Number(lineData[5].trim().replace(',', '.').replace('R$', '')) || 0,
         price: Number(lineData[6].trim().replace(',', '.').replace('R$', '')) || 0,
         grossValue: Number(lineData[7].trim().replace(',', '.').replace('R$', '').replace('\r', '')) || 0
       })

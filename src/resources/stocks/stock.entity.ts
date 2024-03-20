@@ -35,3 +35,17 @@ export class StockList {
     Object.assign(this, data)
   }
 }
+
+export class StocksFromUser extends Stock {
+  @ApiProperty({ example: 1 }) quantity: number
+  @ApiProperty({ example: 'Transferência - Liquidação' }) orderGroup: string
+}
+
+export class StocksFromUserList {
+  @ApiProperty({ type: [StocksFromUser] }) stocks: StocksFromUser[]
+  @ApiProperty({ example: 1 }) count: number
+
+  constructor(data: StocksFromUserList) {
+    Object.assign(this, data)
+  }
+}

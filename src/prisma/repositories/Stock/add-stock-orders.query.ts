@@ -70,6 +70,16 @@ export async function addStockOrdersQuery({ orders, userId }: CreateStockOrderDt
               connect: {
                 name: order.orderType
               }
+            },
+            OrderGroup: {
+              connectOrCreate: {
+                where: {
+                  name: order.orderGroup
+                },
+                create: {
+                  name: order.orderGroup
+                }
+              }
             }
           }
         })

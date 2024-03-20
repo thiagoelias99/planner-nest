@@ -8,7 +8,15 @@ export class CeiCsvUploadService {
 
   async addOrders(data: CsvItem[], userId: string) {
     // Filter only the stocks that are in liquidation
-    const allStocks = data.filter((item) => item?.category === CsvItemCategoryEnum.LIQUIDATION)
+    const allStocks = data.filter((item) =>
+      item?.category === CsvItemCategoryEnum.LIQUIDATION ||
+      // item?.category === CsvItemCategoryEnum.UPDATE ||
+      item?.category === CsvItemCategoryEnum.SPREAD ||
+      item?.category === CsvItemCategoryEnum.FRACTION ||
+      item?.category === CsvItemCategoryEnum.SUBSCRIPTION ||
+      item?.category === CsvItemCategoryEnum.BONUS ||
+      item?.category === CsvItemCategoryEnum.GROUPING
+    )
 
     return this.stockService.addStockOrders({
       userId,
@@ -17,11 +25,12 @@ export class CeiCsvUploadService {
 
         return {
           stockTicker: item.ticker,
-          orderType: item.type === 'Debito' ? 'BUY' : 'SELL',
+          orderType: item.type === 'Credito' || item.category === CsvItemCategoryEnum.SUBSCRIPTION ? 'BUY' : 'SELL',
           quantity: item.quantity,
           price: item.price,
           date: item.date,
-          companyName: item.institution
+          companyName: item.institution,
+          orderGroup: item.category
         }
       })
     })

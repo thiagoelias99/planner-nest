@@ -96,6 +96,7 @@ model StockOrder {
   id                     String   @id @default(uuid())
   stockTicker            String   @map("stock_tickers")
   orderType              String   @map("order_type")
+  orderGroup             String?  @map("order_group")
   userId                 String   @map("user_id")
   quantity               Int
   price                  Decimal  @db.Decimal(10, 2)
@@ -103,9 +104,10 @@ model StockOrder {
   newStockMeanValue      Decimal? @default(0) @map("new_stock_mean_value")
   createdAt              DateTime @map("created_at")
 
-  Stock     Stock     @relation(fields: [stockTicker], references: [ticker])
-  OrderType OrderType @relation(fields: [orderType], references: [name])
-  User      User      @relation(fields: [userId], references: [id])
+  Stock      Stock       @relation(fields: [stockTicker], references: [ticker])
+  OrderType  OrderType   @relation(fields: [orderType], references: [name])
+  OrderGroup OrderGroup? @relation(fields: [orderGroup], references: [name])
+  User       User        @relation(fields: [userId], references: [id])
 
   @@map("stock_orders")
 }
@@ -117,4 +119,12 @@ model OrderType {
   StockOrder StockOrder[]
 
   @@map("order_types")
+}
+
+model OrderGroup {
+  name String @id
+
+  StockOrders StockOrder[]
+
+  @@map("order_groups")
 }

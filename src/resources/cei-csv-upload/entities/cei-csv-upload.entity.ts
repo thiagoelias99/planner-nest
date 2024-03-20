@@ -23,5 +23,12 @@ export enum CsvItemCategoryEnum {
   JCP = 'Juros Sobre Capital Próprio',
   DIVIDEND = 'Dividendo',
   LIQUIDATION = 'Transferência - Liquidação',
-  INCOME = 'Rendimento'
+  INCOME = 'Rendimento',
+  UPDATE = 'Atualização',
+  SPREAD = 'Desdobro',
+  GROUPING = 'Grupamento',
+  FRACTION = 'Fração em Ativos',
+  FRACTION_SALE = 'Leilão de Fração',
+  SUBSCRIPTION = 'Direitos de Subscrição - Excercído',
+  BONUS = 'Bonificação em Ativos',
 }
