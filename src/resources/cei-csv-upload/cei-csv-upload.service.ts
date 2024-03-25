@@ -22,6 +22,12 @@ export class CeiCsvUploadService {
       orders: allStocks.map((item) => {
         if (!item) return
 
+
+        if (item.category === CsvItemCategoryEnum.GROUPING) {
+          // Subtract 2 hour from date
+          item.date.setHours(item.date.getHours() - 2)
+        }
+
         return {
           stockTicker: item.ticker,
           orderType: item.type === 'Credito' || item.category === CsvItemCategoryEnum.SUBSCRIPTION ? 'BUY' : 'SELL',
@@ -29,7 +35,8 @@ export class CeiCsvUploadService {
           price: item.price,
           date: item.date,
           companyName: item.institution,
-          orderGroup: item.category
+          orderGroup: item.category,
+          grossValue: item.grossValue,
         }
       })
     })

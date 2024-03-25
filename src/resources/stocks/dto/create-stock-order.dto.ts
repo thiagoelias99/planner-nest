@@ -15,4 +15,5 @@ interface Order {
   quantity: number
   price: number
   date: Date
+  grossValue: number
 }

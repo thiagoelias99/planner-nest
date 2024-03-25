@@ -21,7 +21,7 @@ export async function getCurrentStockOrdersFromUserQuery(userId: string, prisma:
       type: stockOrder.Stock.type,
       price: Number(stockOrder.Stock.price),
       latestTradingDay: new Date(stockOrder.Stock.latestTradingDay).toISOString(),
-      quantity: stockOrder.quantity,
+      quantity: Number(stockOrder.quantity),
       date: new Date(stockOrder.createdAt),
       buy: stockOrder.orderType === 'BUY',
       orderGroup: stockOrder.orderGroup
