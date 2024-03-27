@@ -47,6 +47,16 @@ export class CeiCsvUploadService {
           }
         }
 
+        // Subscrição MXRF12
+        if (item.ticker === 'MXRF12' && item.category === CsvItemCategoryEnum.SUBSCRIPTION) {
+          // If date is between 2023-12-10 and 2023-12-16 set the price to 10.29
+          if (item.date >= new Date('2023-12-10') && item.date <= new Date('2023-12-16')) {
+            item.price = 10.29
+            item.grossValue = item.quantity * item.price
+          }
+        }
+
+
         return {
           stockTicker: item.ticker,
           orderType: item.type === 'Credito' || item.category === CsvItemCategoryEnum.SUBSCRIPTION ? 'BUY' : 'SELL',
