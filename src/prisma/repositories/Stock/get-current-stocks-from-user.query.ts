@@ -24,7 +24,9 @@ export async function getCurrentStockOrdersFromUserQuery(userId: string, prisma:
       quantity: Number(stockOrder.quantity),
       date: new Date(stockOrder.createdAt),
       buy: stockOrder.orderType === 'BUY',
-      orderGroup: stockOrder.orderGroup
+      orderGroup: stockOrder.orderGroup,
+      grossValue: Number(stockOrder.grossValue),
+      orderPrice: Number(stockOrder.price)
     }
   })
 

@@ -28,6 +28,25 @@ export class CeiCsvUploadService {
           item.date.setHours(item.date.getHours() - 2)
         }
 
+        // Bonificação ITSA4
+        if (item.ticker === 'ITSA4' && item.category === CsvItemCategoryEnum.BONUS) {
+          // If date is between 2021-12-20 and 2021-12-23 set the price to 18.89
+          if (item.date >= new Date('2021-12-20') && item.date <= new Date('2021-12-23')) {
+            item.price = 18.89
+            item.grossValue = item.quantity * item.price
+          }
+          // If date is between 2022-11-10 and 2022-11-16 set the price to 13,65
+          if (item.date >= new Date('2022-11-10') && item.date <= new Date('2022-11-16')) {
+            item.price = 13.65
+            item.grossValue = item.quantity * item.price
+          }
+          // If date is between 2023-11-27 and 2023-12-02 set the price to 17,92
+          if (item.date >= new Date('2023-11-27') && item.date <= new Date('2023-12-02')) {
+            item.price = 17.92
+            item.grossValue = item.quantity * item.price
+          }
+        }
+
         return {
           stockTicker: item.ticker,
           orderType: item.type === 'Credito' || item.category === CsvItemCategoryEnum.SUBSCRIPTION ? 'BUY' : 'SELL',

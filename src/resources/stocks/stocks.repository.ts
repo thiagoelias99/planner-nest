@@ -16,6 +16,8 @@ export interface StockOrderFromUser extends Stock {
   date: Date
   buy: boolean
   orderGroup: string
+  grossValue: number
+  orderPrice: number
 }
 
 export abstract class StocksRepository {

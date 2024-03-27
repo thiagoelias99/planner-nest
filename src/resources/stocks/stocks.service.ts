@@ -75,17 +75,30 @@ export class StocksService {
       if (stocksMap.has(order.ticker)) {
         const currentStock = stocksMap.get(order.ticker)
 
-        let quantity = 0
+        let stockQuantity = 0
         // Affect CASH3
         if (order.orderGroup === 'Grupamento') {
-          quantity = order.quantity
+          stockQuantity = order.quantity
         } else {
-          quantity = currentStock.quantity + order.quantity * (order.buy ? 1 : -1)
+          stockQuantity = currentStock.stockQuantity + order.quantity * (order.buy ? 1 : -1)
+        }
+
+        // Calculate average stock buy price
+        let averageStockBuyPrice = currentStock.averageStockBuyPrice
+        if (order.buy) {
+          if (currentStock.stockQuantity === 0) {
+            averageStockBuyPrice = order.orderPrice
+          } else {
+            averageStockBuyPrice = (((currentStock.averageStockBuyPrice * currentStock.stockQuantity) + (order.grossValue)) / stockQuantity)
+          }
         }
 
         stocksMap.set(order.ticker, {
           ...currentStock,
-          quantity
+          stockQuantity,
+          totalDepositValue: currentStock.totalDepositValue + (order.buy ? order.grossValue : 0),
+          totalWithdrawValue: currentStock.totalWithdrawValue + (order.buy ? 0 : order.grossValue),
+          averageStockBuyPrice
         })
       } else {
         stocksMap.set(order.ticker, {
@@ -96,14 +109,17 @@ export class StocksService {
           orderGroup: order.orderGroup,
           price: order.price,
           latestTradingDay: order.latestTradingDay,
-          quantity: order.quantity * (order.buy ? 1 : -1)
+          stockQuantity: order.quantity * (order.buy ? 1 : -1),
+          totalDepositValue: order.grossValue,
+          totalWithdrawValue: 0,
+          averageStockBuyPrice: order.orderPrice
         })
       }
     })
 
     const noZeroStocks = Array
       .from(stocksMap.values())
-      .filter(stock => stock.quantity !== 0)
+      .filter(stock => stock.stockQuantity !== 0)
       .sort((a, b) => {
         if (a.ticker < b.ticker) {
           return -1

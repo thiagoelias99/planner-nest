@@ -38,8 +38,11 @@ export class StockList {
 }
 
 export class StocksFromUser extends Stock {
-  @ApiProperty({ example: 1 }) quantity: number
+  @ApiProperty({ example: 1 }) stockQuantity: number
   @Exclude() orderGroup: string
+  @ApiProperty({ example: 9999.99 }) totalDepositValue: number
+  @ApiProperty({ example: 9999.99 }) totalWithdrawValue: number
+  @ApiProperty({ example: 99.99 }) averageStockBuyPrice: number
 }
 
 export class StocksFromUserList {
