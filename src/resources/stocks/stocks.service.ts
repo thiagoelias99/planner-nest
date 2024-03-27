@@ -77,6 +77,11 @@ export class StocksService {
         return
       }
 
+      // Consider MGLU3 only from Clear
+      if (order.ticker === 'MGLU3' && !order.broker.startsWith('CLEAR')) {
+        return
+      }
+
       if (stocksMap.has(order.ticker)) {
         const currentStock = stocksMap.get(order.ticker)
 
