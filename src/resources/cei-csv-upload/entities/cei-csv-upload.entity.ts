@@ -4,7 +4,7 @@ export class CsvItem {
   public category: CsvItemCategoryEnum
   public ticker: string
   public institution: string
-  public holder: string
+  public broker: string
   public quantity: number
   public price: number
   public grossValue: number

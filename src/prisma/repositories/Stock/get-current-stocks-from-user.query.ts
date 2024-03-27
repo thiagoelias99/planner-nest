@@ -26,7 +26,8 @@ export async function getCurrentStockOrdersFromUserQuery(userId: string, prisma:
       buy: stockOrder.orderType === 'BUY',
       orderGroup: stockOrder.orderGroup,
       grossValue: Number(stockOrder.grossValue),
-      orderPrice: Number(stockOrder.price)
+      orderPrice: Number(stockOrder.price),
+      broker: stockOrder.broker
     }
   })
 

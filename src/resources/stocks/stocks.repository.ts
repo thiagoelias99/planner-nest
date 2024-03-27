@@ -18,6 +18,7 @@ export interface StockOrderFromUser extends Stock {
   orderGroup: string
   grossValue: number
   orderPrice: number
+  broker: string
 }
 
 export abstract class StocksRepository {

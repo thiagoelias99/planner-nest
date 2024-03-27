@@ -16,4 +16,5 @@ interface Order {
   price: number
   date: Date
   grossValue: number
+  broker: string
 }

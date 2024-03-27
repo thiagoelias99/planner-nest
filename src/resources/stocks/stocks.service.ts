@@ -72,6 +72,11 @@ export class StocksService {
       // Substitute VIVT3 to VIVT4
       order.ticker = order.ticker.replace('VIVT3', 'VIVT4')
 
+      // Ignore IVVB11 from Clear
+      if (order.broker.startsWith('CLEAR') && order.ticker === 'IVVB11') {
+        return
+      }
+
       if (stocksMap.has(order.ticker)) {
         const currentStock = stocksMap.get(order.ticker)
 

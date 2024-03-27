@@ -42,6 +42,7 @@ export async function addStockOrdersQuery({ orders, userId }: CreateStockOrderDt
             price: order.price,
             createdAt: order.date,
             grossValue: order.grossValue,
+            broker: order.broker,
             Stock: {
               connectOrCreate: {
                 where: {

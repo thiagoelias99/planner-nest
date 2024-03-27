@@ -56,6 +56,7 @@ export class CeiCsvUploadService {
           companyName: item.institution,
           orderGroup: item.category,
           grossValue: item.grossValue,
+          broker: item.broker
         }
       })
     })

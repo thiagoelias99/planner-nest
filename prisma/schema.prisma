@@ -93,15 +93,16 @@ model StockType {
 }
 
 model StockOrder {
-  id                     String   @id @default(uuid())
-  stockTicker            String   @map("stock_tickers")
-  orderType              String   @map("order_type")
-  orderGroup             String?  @map("order_group")
-  userId                 String   @map("user_id")
-  quantity               Decimal  @db.Decimal(10, 2)
-  price                  Decimal  @db.Decimal(10, 2)
-  grossValue             Decimal  @map("gross_value") @db.Decimal(10, 2) @default(0)
-  createdAt              DateTime @map("created_at")
+  id          String   @id @default(uuid())
+  stockTicker String   @map("stock_tickers")
+  orderType   String   @map("order_type")
+  orderGroup  String?  @map("order_group")
+  userId      String   @map("user_id")
+  quantity    Decimal  @db.Decimal(10, 2)
+  price       Decimal  @db.Decimal(10, 2)
+  grossValue  Decimal  @default(0) @map("gross_value") @db.Decimal(10, 2)
+  createdAt   DateTime @map("created_at")
+  broker      String   @map("broker") @default("")
 
   Stock      Stock       @relation(fields: [stockTicker], references: [ticker])
   OrderType  OrderType   @relation(fields: [orderType], references: [name])
