@@ -30,10 +30,6 @@ export async function getCurrentStockOrdersFromUserQuery(userId: string, prisma:
       broker: stockOrder.broker
     }
   })
-
-  // console.log('data', data[data.length - 1])
-  // return data.filter((item) =>
-  //   item.ticker === 'CASH3'
-  // )
+  
   return data
 }

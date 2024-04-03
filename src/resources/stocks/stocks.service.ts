@@ -2,42 +2,17 @@ import { Injectable } from '@nestjs/common'
 import { StocksRepository } from './stocks.repository'
 import { Stock, StocksFromUser, StocksFromUserList } from './stock.entity'
 import { CreateStockOrderDto } from './dto/create-stock-order.dto'
-
-export interface GlobalQuote {
-  '01. symbol': string;
-  '02. open': string;
-  '03. high': string;
-  '04. low': string;
-  '05. price': string;
-  '06. volume': string;
-  '07. latest trading day': Date;
-  '08. previous close': string;
-  '09. change': string;
-  '10. change percent': string;
-}
-
-export interface Response2 {
-  bestMatches: BestMatch[];
-}
-
-export interface BestMatch {
-  '1. symbol': string;
-  '2. name': string;
-  '3. type': string;
-  '4. region': string;
-  '5. marketOpen': string;
-  '6. marketClose': string;
-  '7. timezone': string;
-  '8. currency': string;
-  '9. matchScore': string;
-}
+import { StockApiService } from 'src/services/stock-api.service'
+import * as moment from 'moment'
 
 @Injectable()
 export class StocksService {
-  constructor(private readonly stockRepository: StocksRepository) { }
+  constructor(
+    private readonly stockRepository: StocksRepository,
+    private readonly stockApiService: StockApiService
+  ) { }
 
   async findStockByTicker(ticker: string): Promise<Stock | null> {
-    console.log('findStockByTicker', ticker)
     return this.stockRepository.findStockByTicker(ticker)
   }
 
@@ -47,6 +22,15 @@ export class StocksService {
 
   async addStockOrders(data: CreateStockOrderDto) {
     return this.stockRepository.addStockOrders(data)
+  }
+
+  async refreshStock(ticker: string): Promise<Stock> {
+    const updateData = await this.stockApiService.updateStock(ticker)
+    if (!updateData) {
+      return null
+    }
+
+    return this.stockRepository.updateStockPrice(ticker, updateData)
   }
 
   async getCurrentStocksFromUser(userId: string): Promise<StocksFromUserList> {
@@ -122,7 +106,8 @@ export class StocksService {
           stockQuantity: order.quantity * (order.buy ? 1 : -1),
           totalDepositValue: order.grossValue,
           totalWithdrawValue: 0,
-          averageStockBuyPrice: order.orderPrice
+          averageStockBuyPrice: order.orderPrice,
+          profitability: 0
         })
       }
     })
@@ -139,6 +124,39 @@ export class StocksService {
         }
         return 0
       })
+
+    // If stock latestTradingDay is 2 day ago, update from api
+    const today = moment()
+
+    await Promise.all(
+      noZeroStocks.map(stock => new Promise((resolve) => {
+        // If stock = GOLD11 or IVVB11, ignore
+        if (stock.ticker === 'GOLD11' || stock.ticker === 'IVVB11') {
+          resolve('')
+        }
+
+        const latestTradingDay = moment(stock.latestTradingDay)
+        const diffDays = today.diff(latestTradingDay, 'day')
+        if (diffDays > 1) {
+          this.refreshStock(stock.ticker)
+            .then(updatedStock => {
+              if (updatedStock) {
+                stock.price = updatedStock.price
+                stock.latestTradingDay = updatedStock.latestTradingDay
+              }
+            })
+        }
+
+        // update profitability
+        if (stock.price === 0) {
+          stock.profitability = 0
+        } else {
+          stock.profitability = (stock.price/stock.averageStockBuyPrice - 1) * 100
+        }
+
+        resolve('')
+      }))
+    )
 
     const data = {
       stocks: noZeroStocks,

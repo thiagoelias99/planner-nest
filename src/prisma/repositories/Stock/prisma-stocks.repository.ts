@@ -8,6 +8,8 @@ import { Injectable } from '@nestjs/common'
 import { CreateStockOrderDto } from 'src/resources/stocks/dto/create-stock-order.dto'
 import { addStockOrdersQuery } from './add-stock-orders.query'
 import { getCurrentStockOrdersFromUserQuery } from './get-current-stocks-from-user.query'
+import { GlobalQuote } from 'src/services/stock-api.service'
+import { updateStockPriceQuery } from './update-stock-price.query'
 
 @Injectable()
 export class PrismaStocksRepository extends StocksRepository {
@@ -33,5 +35,9 @@ export class PrismaStocksRepository extends StocksRepository {
 
   getCurrentStockOrdersFromUser(userId: string): Promise<StockOrderFromUser[]> {
     return getCurrentStockOrdersFromUserQuery(userId, this.prisma)
+  }
+
+  updateStockPrice(ticker: string, data: GlobalQuote): Promise<Stock> {
+    return updateStockPriceQuery(ticker, data, this.prisma)
   }
 }

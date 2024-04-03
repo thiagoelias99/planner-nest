@@ -1,3 +1,4 @@
+import { GlobalQuote } from 'src/services/stock-api.service'
 import { CreateStockOrderDto } from './dto/create-stock-order.dto'
 import { CreateStockDto } from './dto/create-stock.dto'
 import { Stock } from './stock.entity'
@@ -27,4 +28,5 @@ export abstract class StocksRepository {
   abstract getStockTypes(): Promise<string[]>
   abstract addStockOrders(createStockOrderDto: CreateStockOrderDto): Promise<void>
   abstract getCurrentStockOrdersFromUser(userId: string): Promise<StockOrderFromUser[]>
+  abstract updateStockPrice(ticker: string, data: GlobalQuote): Promise<Stock>
 }

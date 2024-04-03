@@ -4,6 +4,7 @@ import { StocksController } from './stocks.controller'
 import { PrismaModule } from 'src/prisma/prisma.module'
 import { IsStockTypeValidator } from './validators/is-stock-type'
 import { IsUniqueStockValidator } from './validators/is-unique-stock.validator'
+import { StockApiService } from 'src/services/stock-api.service'
 
 @Module({
   imports: [PrismaModule],
@@ -11,7 +12,8 @@ import { IsUniqueStockValidator } from './validators/is-unique-stock.validator'
   providers: [
     StocksService,
     IsStockTypeValidator,
-    IsUniqueStockValidator
+    IsUniqueStockValidator,
+    StockApiService
   ],
   exports: [StocksService]
 })

@@ -94,6 +94,6 @@ export async function addStockOrdersQuery({ orders, userId }: CreateStockOrderDt
     }
   }))
 
-  // console.log(`Added: ${added} Ignored: ${ignored} Errors: ${errors}`)
+  console.log(`Added: ${added} Ignored: ${ignored} Errors: ${errors}`)
   return { added, ignored, errors }
 }

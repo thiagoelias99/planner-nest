@@ -45,6 +45,7 @@
     "cors": "^2.8.5",
     "cors-ts": "^1.0.3",
     "dotenv-cli": "^7.3.0",
+    "moment": "^2.30.1",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1"
