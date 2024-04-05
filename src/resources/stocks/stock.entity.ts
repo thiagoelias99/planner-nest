@@ -44,6 +44,7 @@ export class StocksFromUser extends Stock {
   @ApiProperty({ example: 9999.99 }) totalWithdrawValue: number
   @ApiProperty({ example: 99.99 }) averageStockBuyPrice: number
   @ApiProperty({ example: 0.99 }) profitability: number
+  @ApiProperty({ example: 199.99 }) profit: number
 }
 
 export class StockType {

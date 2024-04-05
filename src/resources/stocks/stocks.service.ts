@@ -107,7 +107,8 @@ export class StocksService {
           totalDepositValue: order.grossValue,
           totalWithdrawValue: 0,
           averageStockBuyPrice: order.orderPrice,
-          profitability: 0
+          profitability: 0,
+          profit: 0
         })
       }
     })
@@ -152,11 +153,13 @@ export class StocksService {
             })
         }
 
-        // update profitability
+        // update profit & profitability
         if (stock.price === 0) {
           stock.profitability = 0
+          stock.profit = 0
         } else {
           stock.profitability = (stock.price / stock.averageStockBuyPrice - 1) * 100
+          stock.profit = (stock.price - stock.averageStockBuyPrice) * stock.stockQuantity
         }
 
         resolve('')
