@@ -22,7 +22,7 @@ import { CeiCsvUploadModule } from './resources/cei-csv-upload/cei-csv-upload.mo
         useFactory: (configService: ConfigService) => {
           return {
             secret: configService.get<string>('JWT_SECRET'),
-            signOptions: { expiresIn: '72h' },
+            signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES') },
           }
         },
         inject: [ConfigService],

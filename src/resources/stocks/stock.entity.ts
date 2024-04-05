@@ -44,12 +44,23 @@ export class StocksFromUser extends Stock {
   @ApiProperty({ example: 9999.99 }) totalWithdrawValue: number
   @ApiProperty({ example: 99.99 }) averageStockBuyPrice: number
   @ApiProperty({ example: 0.99 }) profitability: number
+}
 
+export class StockType {
+  @ApiProperty({ type: [StocksFromUser] }) data: StocksFromUser[]
+  @ApiProperty({ example: 9999.99 }) totalAmount: number
+  @ApiProperty({ example: 25.00 }) percentage: number
+  @ApiProperty({ example: 10 }) count: number
 }
 
 export class StocksFromUserList {
-  @ApiProperty({ type: [StocksFromUser] }) stocks: StocksFromUser[]
+  @ApiProperty({ type: [StocksFromUser] }) stocks: StockType
+  @ApiProperty({ type: [StocksFromUser] }) reits: StockType
+  @ApiProperty({ type: [StocksFromUser] }) internationals: StockType
+  @ApiProperty({ type: [StocksFromUser] }) cryptos: StockType
+  @ApiProperty({ type: [StocksFromUser] }) gold: StockType
   @ApiProperty({ example: 1 }) count: number
+  @ApiProperty({ example: 9999.99 }) totalAmount: number
 
   constructor(data: StocksFromUserList) {
     Object.assign(this, data)

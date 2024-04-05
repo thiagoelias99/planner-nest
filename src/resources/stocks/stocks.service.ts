@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { StocksRepository } from './stocks.repository'
-import { Stock, StocksFromUser, StocksFromUserList } from './stock.entity'
+import { Stock, StockType, StocksFromUser, StocksFromUserList } from './stock.entity'
 import { CreateStockOrderDto } from './dto/create-stock-order.dto'
 import { StockApiService } from 'src/services/stock-api.service'
 import * as moment from 'moment'
@@ -125,6 +125,11 @@ export class StocksService {
         return 0
       })
 
+    // Delete orderGroup
+    noZeroStocks.forEach(stock => {
+      delete stock.orderGroup
+    })
+
     // If stock latestTradingDay is 2 day ago, update from api
     const today = moment()
 
@@ -151,16 +156,58 @@ export class StocksService {
         if (stock.price === 0) {
           stock.profitability = 0
         } else {
-          stock.profitability = (stock.price/stock.averageStockBuyPrice - 1) * 100
+          stock.profitability = (stock.price / stock.averageStockBuyPrice - 1) * 100
         }
 
         resolve('')
       }))
     )
 
-    const data = {
-      stocks: noZeroStocks,
-      count: noZeroStocks.length
+    const totalAmount = noZeroStocks.reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0)
+
+    const stocks: StockType = {
+      data: noZeroStocks.filter(stock => stock.type === 'Ação'),
+      totalAmount: noZeroStocks.filter(stock => stock.type === 'Ação').reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0),
+      percentage: totalAmount === 0 ? 0 : (noZeroStocks.filter(stock => stock.type === 'Ação').reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0) / totalAmount) * 100,
+      count: noZeroStocks.filter(stock => stock.type === 'Ação').length
+    }
+
+    const reits: StockType = {
+      data: noZeroStocks.filter(stock => stock.type === 'FII'),
+      totalAmount: noZeroStocks.filter(stock => stock.type === 'FII').reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0),
+      percentage: totalAmount === 0 ? 0 : (noZeroStocks.filter(stock => stock.type === 'FII').reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0) / totalAmount) * 100,
+      count: noZeroStocks.filter(stock => stock.type === 'FII').length
+    }
+
+    const internationals: StockType = {
+      data: noZeroStocks.filter(stock => stock.ticker === 'IVVB11'),
+      totalAmount: noZeroStocks.filter(stock => stock.ticker === 'IVVB11').reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0),
+      percentage: totalAmount === 0 ? 0 : (noZeroStocks.filter(stock => stock.ticker === 'IVVB11').reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0) / totalAmount) * 100,
+      count: noZeroStocks.filter(stock => stock.ticker === 'IVVB11').length
+    }
+
+    const cryptos: StockType = {
+      data: noZeroStocks.filter(stock => stock.ticker === 'QBTC11'),
+      totalAmount: noZeroStocks.filter(stock => stock.ticker === 'QBTC11').reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0),
+      percentage: totalAmount === 0 ? 0 : (noZeroStocks.filter(stock => stock.ticker === 'QBTC11').reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0) / totalAmount) * 100,
+      count: noZeroStocks.filter(stock => stock.ticker === 'QBTC11').length
+    }
+
+    const gold: StockType = {
+      data: noZeroStocks.filter(stock => stock.ticker === 'GOLD11'),
+      totalAmount: noZeroStocks.filter(stock => stock.ticker === 'GOLD11').reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0),
+      percentage: totalAmount === 0 ? 0 : (noZeroStocks.filter(stock => stock.ticker === 'GOLD11').reduce((acc, stock) => acc + stock.price * stock.stockQuantity, 0) / totalAmount) * 100,
+      count: noZeroStocks.filter(stock => stock.ticker === 'GOLD11').length
+    }
+
+    const data: StocksFromUserList = {
+      count: noZeroStocks.length,
+      totalAmount,
+      stocks,
+      reits,
+      internationals,
+      cryptos,
+      gold
     }
 
     return data
