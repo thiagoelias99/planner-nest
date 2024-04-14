@@ -23,6 +23,7 @@ model User {
   Preferences UserPreference @relation(fields: [userPreferenceId], references: [id])
   ToDos       ToDo[]
   StockOrders StockOrder[]
+  BudgetItens BudgetItem[]
 
   @@map("users")
 }
@@ -102,7 +103,7 @@ model StockOrder {
   price       Decimal  @db.Decimal(10, 2)
   grossValue  Decimal  @default(0) @map("gross_value") @db.Decimal(10, 2)
   createdAt   DateTime @map("created_at")
-  broker      String   @map("broker") @default("")
+  broker      String   @default("") @map("broker")
 
   Stock      Stock       @relation(fields: [stockTicker], references: [ticker])
   OrderType  OrderType   @relation(fields: [orderType], references: [name])
@@ -127,4 +128,17 @@ model OrderGroup {
   StockOrders StockOrder[]
 
   @@map("order_groups")
+}
+
+model BudgetItem {
+  id       String  @id @default(uuid())
+  userId   String  @map("user_id")
+  isIncome Boolean @map("is_income")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  User User @relation(fields: [userId], references: [id])
+
+  @@map("budget_incomes")
 }
