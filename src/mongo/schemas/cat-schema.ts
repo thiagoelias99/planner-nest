@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose'
-import { Cat } from 'src/resources/playground/playground.entity'
+import { Cat } from '../../resources/playground/playground.entity'
 
 export interface IMongoCatSchema extends Omit<Cat, 'id'> {
   _id: string

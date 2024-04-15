@@ -1,5 +1,5 @@
-import { PrismaService } from 'src/prisma/prisma-service.ts'
-import { UpdateUserDto } from 'src/resources/users/dto/update-user.dto'
+import { PrismaService } from '../../prisma-service.ts'
+import { UpdateUserDto } from '../../../resources/users/dto/update-user.dto'
 
 export async function updateProfileQuery(userId: string, data: UpdateUserDto, prima: PrismaService) {
   const { city, country, state, ...rest } = data

@@ -1,5 +1,5 @@
 import { PrismaService } from '../../prisma-service.ts'
-import { CreateUserDto } from '../../../resources/users/dto/create-user.dto.js'
+import { CreateUserDto } from '../../../resources/users/dto/create-user.dto'
 
 export async function createUserQuery(data: CreateUserDto, prisma: PrismaService): Promise<string> {
   const userFromDb = await prisma.user.create({

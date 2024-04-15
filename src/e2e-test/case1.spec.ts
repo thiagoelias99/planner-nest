@@ -18,7 +18,7 @@ import { useContainer } from 'class-validator'
 
 import { AppModule } from '../app.module'
 import { CreateUserDto } from '../resources/users/dto/create-user.dto'
-import { UpdateUserDto } from 'src/resources/users/dto/update-user.dto'
+import { UpdateUserDto } from '../resources/users/dto/update-user.dto'
 // import { response } from 'express'
 
 const userLoginData = CreateUserDto.mock()

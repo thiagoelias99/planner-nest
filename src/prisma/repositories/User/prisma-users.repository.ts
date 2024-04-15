@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../prisma-service.ts'
-import { CreateUserDto } from '../../../resources/users/dto/create-user.dto.js'
+import { CreateUserDto } from '../../../resources/users/dto/create-user.dto'
 import { User } from '../../../resources/users/entities/user.entity'
 import { UsersRepository } from '../../../resources/users/users.repository'
 import { findByEmailQuery } from './find-by-email'

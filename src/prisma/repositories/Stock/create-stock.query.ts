@@ -1,5 +1,5 @@
-import { PrismaService } from 'src/prisma/prisma-service.ts'
-import { CreateStockDtoComplete } from 'src/resources/stocks/stocks.repository'
+import { PrismaService } from '../../prisma-service.ts'
+import { CreateStockDtoComplete } from '../../../resources/stocks/stocks.repository'
 
 
 export async function createStockQuery(createStockDto: CreateStockDtoComplete, prisma: PrismaService): Promise<string> {

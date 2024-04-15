@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { StocksRepository } from './stocks.repository'
 import { Stock, StockType, StocksFromUser, StocksFromUserList } from './stock.entity'
 import { CreateStockOrderDto } from './dto/create-stock-order.dto'
-import { StockApiService } from 'src/services/stock-api.service'
+import { StockApiService } from '../../services/stock-api.service'
 import * as moment from 'moment'
 
 @Injectable()

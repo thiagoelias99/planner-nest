@@ -1,5 +1,5 @@
 import { InternalServerErrorException } from '@nestjs/common'
-import { Stock } from 'src/resources/stocks/stock.entity'
+import { Stock } from '../../../../resources/stocks/stock.entity'
 
 export function stockToEntityDto(stockFromDb: any): Stock {
   try {
