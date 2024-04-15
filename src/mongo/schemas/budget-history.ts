@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose'
-import { IBudgetHistory } from 'src/resources/budgets/budgets.entity'
+import { Budget } from 'src/resources/budgets/budgets.entity'
 
-interface IMongoBudgetHistorySchema extends IBudgetHistory {
+interface IMongoBudgetHistorySchema extends Budget {
   _id: string
 }
 

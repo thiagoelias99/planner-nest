@@ -15,7 +15,7 @@ export enum UserPreferenceTheme {
 
 export class UserPreference {
   @ApiProperty({ example: 'pt-br', enum: UserPreferenceLanguage}) language: UserPreferenceLanguage
-  @ApiProperty({ example: 'default' }) theme: UserPreferenceTheme
+  @ApiProperty({ example: 'default', enum: UserPreferenceTheme}) theme: UserPreferenceTheme
   @Exclude() createdAt: Date
   @Exclude() updatedAt: Date
   @Exclude() id: string
