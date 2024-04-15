@@ -4,6 +4,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { BudgetsService } from './budgets.service'
 import { Budget } from './budgets.entity'
 import { AuthGuard, UserRequest } from 'src/guards/auth.guard'
+import { CreateBudgetDto } from './dto/create-budget.dto'
 
 @Controller('budgets')
 @ApiTags('Budgets')
@@ -13,15 +14,17 @@ export class BudgetsController {
   @Post('')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a new budget' })
+  @ApiOperation({ summary: 'Create a new budget', description: 'Only value is required, all the other fields are optionals.'})
   @ApiResponse({
     status: 201,
     description: 'Created',
     type: Budget
   })
-  async create(@Req() req: UserRequest, @Body() data: {}) {
+  async create(@Req() req: UserRequest, @Body() data: CreateBudgetDto) {
 
-
-    return { userName: req.user.name }
+    return {
+      userName: req.user.name,
+      ...data
+    }
   }
 }
