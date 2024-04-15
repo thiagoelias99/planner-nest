@@ -1,4 +1,4 @@
-import { PrismaService } from 'src/prisma/prisma-service.ts'
+import { PrismaService } from '../../prisma-service.ts'
 import { CreateTodoDto } from '../../../resources/todos/dto/create-todo.dto'
 import { TodosRepository } from '../../../resources/todos/todos.repository'
 import { createTodoQuery } from './create-todo'

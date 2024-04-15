@@ -1,6 +1,6 @@
-import { PrismaService } from 'src/prisma/prisma-service.ts'
-import { StockOrderFromUser } from 'src/resources/stocks/stocks.repository'
-// import { Stock } from 'src/resources/stocks/stock.entity'
+import { PrismaService } from '../../prisma-service.ts'
+import { StockOrderFromUser } from '../../../resources/stocks/stocks.repository'
+// import { Stock } from '../../../resources/stocks/stock.entity'
 // import { stockToEntityDto } from './dto/stock-to-entity-dto'
 
 export async function getCurrentStockOrdersFromUserQuery(userId: string, prisma: PrismaService): Promise<StockOrderFromUser[]> {

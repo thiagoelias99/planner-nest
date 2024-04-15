@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose'
-import { PlaygroundNoSQLRepository } from 'src/resources/playground/playground.repository'
+import { PlaygroundNoSQLRepository } from '../resources/playground/playground.repository'
 import { MongoPlaygroundRepository } from './repositories/Playground/mongo-playground.repository'
 
 export const mongoProvider = [

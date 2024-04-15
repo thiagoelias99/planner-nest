@@ -1,5 +1,5 @@
-import { PrismaService } from 'src/prisma/prisma-service.ts'
-import { CreateStockOrderDto } from 'src/resources/stocks/dto/create-stock-order.dto'
+import { PrismaService } from '../../prisma-service.ts'
+import { CreateStockOrderDto } from '../../../resources/stocks/dto/create-stock-order.dto'
 
 export async function addStockOrdersQuery({ orders, userId }: CreateStockOrderDto, prisma: PrismaService): Promise<any> {
   let added: number = 0

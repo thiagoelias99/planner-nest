@@ -1,4 +1,4 @@
-import { PrismaService } from 'src/prisma/prisma-service.ts'
+import { PrismaService } from '../../prisma-service.ts'
 
 export async function deleteUUidQuery(userId: string, prisma: PrismaService): Promise<unknown> {
 

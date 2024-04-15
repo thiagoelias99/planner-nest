@@ -4,7 +4,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags
 import { FileInterceptor } from '@nestjs/platform-express'
 import { FileUploadDto } from './dto/file-upload.dto'
 import { CsvItem, CsvItemCategoryEnum, CsvItemTypeEnum } from './entities/cei-csv-upload.entity'
-import { AuthGuard, UserRequest } from 'src/guards/auth.guard'
+import { AuthGuard, UserRequest } from '../../guards/auth.guard'
 
 @Controller('cei_upload')
 @ApiTags('CEI csv Upload')

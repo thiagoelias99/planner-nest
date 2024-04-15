@@ -1,4 +1,4 @@
-import { GlobalQuote } from 'src/services/stock-api.service'
+import { GlobalQuote } from '../../services/stock-api.service'
 import { CreateStockOrderDto } from './dto/create-stock-order.dto'
 import { CreateStockDto } from './dto/create-stock.dto'
 import { Stock } from './stock.entity'

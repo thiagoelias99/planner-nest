@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { randomUUID } from 'crypto'
 import { Connection } from 'mongoose'
-import { IMongoCatSchema, catSchema } from 'src/mongo/schemas/cat-schema'
-import { CreateCatDto } from 'src/resources/playground/dto/create-cat-dto'
-import { Cat } from 'src/resources/playground/playground.entity'
-import { PlaygroundNoSQLRepository } from 'src/resources/playground/playground.repository'
+import { IMongoCatSchema, catSchema } from '../../schemas/cat-schema'
+import { CreateCatDto } from '../../../resources/playground/dto/create-cat-dto'
+import { Cat } from '../../../resources/playground/playground.entity'
+import { PlaygroundNoSQLRepository } from '../../../resources/playground/playground.repository'
 
 @Injectable()
 export class MongoPlaygroundRepository extends PlaygroundNoSQLRepository {

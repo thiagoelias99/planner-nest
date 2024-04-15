@@ -2,7 +2,7 @@ import { Controller, UseGuards, Req, Get } from '@nestjs/common'
 import { StocksService } from './stocks.service'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { StocksFromUserList } from './stock.entity'
-import { AuthGuard, UserRequest } from 'src/guards/auth.guard'
+import { AuthGuard, UserRequest } from '../../guards/auth.guard'
 
 @Controller('stocks')
 @ApiTags('Stocks')

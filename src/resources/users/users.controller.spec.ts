@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { CreateUserDto } from './dto/create-user.dto'
 import { User } from './entities/user.entity'
-import { UserRequest } from 'src/guards/auth.guard'
+import { UserRequest } from '../../guards/auth.guard'
 import { randomUUID } from 'crypto'
 
 const signupData: CreateUserDto = CreateUserDto.mock()
