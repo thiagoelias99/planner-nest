@@ -1,6 +1,8 @@
 import * as mongoose from 'mongoose'
 import { PlaygroundNoSQLRepository } from '../resources/playground/playground.repository'
 import { MongoPlaygroundRepository } from './repositories/Playground/mongo-playground.repository'
+import { BudgetsRepository } from '../resources/budgets/budgets.repository'
+import { MongoBudgetsRepository } from './repositories/Budget/mongo-budget.repository'
 
 export const mongoProvider = [
   {
@@ -11,5 +13,9 @@ export const mongoProvider = [
   {
     provide: PlaygroundNoSQLRepository,
     useClass: MongoPlaygroundRepository,
+  },
+  {
+    provide: BudgetsRepository,
+    useClass: MongoBudgetsRepository
   }
 ]

@@ -7,8 +7,6 @@ import { TodosRepository } from '../resources/todos/todos.repository'
 import { PrismaTodosRepository } from './repositories/Todo/prisma-todos.repository'
 import { StocksRepository } from '../resources/stocks/stocks.repository'
 import { PrismaStocksRepository } from './repositories/Stock/prisma-stocks.repository'
-import { BudgetsRepository } from '../resources/budgets/budgets.repository'
-import { PrismaBudgetsRepository } from './repositories/Budget/prisma-budgets.repository'
 
 @Module({
   providers: [
@@ -25,17 +23,12 @@ import { PrismaBudgetsRepository } from './repositories/Budget/prisma-budgets.re
       provide: StocksRepository,
       useClass: PrismaStocksRepository
     },
-    {
-      provide: BudgetsRepository,
-      useClass: PrismaBudgetsRepository
-    }
   ],
   exports: [
     PrismaService,
     UsersRepository,
     TodosRepository,
-    StocksRepository,
-    BudgetsRepository
+    StocksRepository
   ]
 })
 export class PrismaModule { }
