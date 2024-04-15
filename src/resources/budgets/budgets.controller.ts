@@ -1,9 +1,9 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Post, Req, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 import { BudgetsService } from './budgets.service'
 import { Budget } from './budgets.entity'
-import { AuthGuard, UserRequest } from 'src/guards/auth.guard'
+import { AuthGuard, UserRequest } from '../../guards/auth.guard'
 import { CreateBudgetDto } from './dto/create-budget.dto'
 
 @Controller('budgets')
@@ -14,7 +14,7 @@ export class BudgetsController {
   @Post('')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a new budget', description: 'Only value is required, all the other fields are optionals.'})
+  @ApiOperation({ summary: 'Create a new budget', description: 'Only value is required, all the other fields are optionals.' })
   @ApiResponse({
     status: 201,
     description: 'Created',
@@ -22,9 +22,16 @@ export class BudgetsController {
   })
   async create(@Req() req: UserRequest, @Body() data: CreateBudgetDto) {
 
-    return {
-      userName: req.user.name,
-      ...data
+    //Return bad request if endDate is before startDate
+    if (data.startDate && data.endDate && data.startDate > data.endDate) {
+      throw new BadRequestException('End date must be after start date')
     }
+
+    //Return bad request if endDate is provided without startDate
+    if (!data.startDate && data.endDate) {
+      throw new BadRequestException('End date must be provided with start date')
+    }
+
+    return this.budgetsService.create(req.user.id, data)
   }
 }

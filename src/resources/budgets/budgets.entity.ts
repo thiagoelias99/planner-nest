@@ -50,4 +50,21 @@ export class Budget {
   @ApiProperty({ example: true }) isRecurrent: boolean
   @ApiProperty({ example: BudgetPaymentMethodEnum.CREDIT, enum: BudgetPaymentMethodEnum, required: false, default: BudgetPaymentMethodEnum.DEBIT }) paymentMethod?: BudgetPaymentMethodEnum
   @ApiProperty({ type: RecurrenceHistory }) recurrenceHistory?: RecurrenceHistory
+
+  public static mock(): Budget {
+    const data = {
+      id: '21f58a70-3d62-4524-b564-3464d85e9e0d',
+      isIncome: false,
+      description: 'Salary',
+      currentValue: 1000,
+      expectedDay: 1,
+      isRecurrent: true,
+      paymentMethod: BudgetPaymentMethodEnum.CREDIT,
+      recurrenceHistory: {
+        activePeriods: [ActiveHistory.mock()],
+        registers: [Register.mock()]
+      }
+    }
+    return data as Budget
+  }
 }
