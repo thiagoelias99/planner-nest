@@ -10,6 +10,7 @@ import { TodosModule } from './resources/todos/todos.module'
 import { StocksModule } from './resources/stocks/stocks.module'
 import { CeiCsvUploadModule } from './resources/cei-csv-upload/cei-csv-upload.module'
 import { BudgetsModule } from './resources/budgets/budgets.module'
+import { PlaygroundModule } from './resources/playground/playground.module'
 
 
 @Module({
@@ -33,7 +34,8 @@ import { BudgetsModule } from './resources/budgets/budgets.module'
       TodosModule,
       StocksModule,
       CeiCsvUploadModule,
-      BudgetsModule
+      BudgetsModule,
+      PlaygroundModule,
     ],
   controllers: [AppController],
   providers: [
