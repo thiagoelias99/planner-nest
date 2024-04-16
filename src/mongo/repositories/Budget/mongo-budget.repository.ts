@@ -1,11 +1,42 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
+import { Connection } from 'mongoose'
 import { BudgetCreateDto, BudgetsRepository } from '../../../resources/budgets/budgets.repository'
 import { Budget } from '../../../resources/budgets/budgets.entity'
+import { IMongoBudgetSchema, budgetSchema } from '../../schemas/budget-schema'
 
 @Injectable()
 export class MongoBudgetsRepository extends BudgetsRepository {
-  create(data: BudgetCreateDto): Promise<Budget> {
-    throw new Error('Method not implemented.')
+  constructor(@Inject('MONGO_DATABASE_CONNECTION') private readonly mongo: Connection) {
+    super()
   }
 
+  private budgetModel = this.mongo.model<IMongoBudgetSchema>('budgets', budgetSchema)
+
+  async create(data: BudgetCreateDto): Promise<Budget> {
+    try {
+      const createdBudget = (await this.budgetModel.create({ ...data, _id: data.id, currentValue: data.value })).toJSON()
+      createdBudget.id = createdBudget._id
+      delete createdBudget._id
+
+      return new Budget({
+        ...createdBudget,
+        recurrenceHistory: {
+          activePeriods: createdBudget.recurrenceHistory.activePeriods.map((activePeriod: any) => ({
+            startDate: activePeriod.startDate,
+            endDate: activePeriod.endDate
+          })),
+          registers: createdBudget.recurrenceHistory.registers.map((register: any) => ({
+            id: register.id,
+            value: register.value,
+            date: register.date,
+            consolidated: register.checked
+          }))
+        }
+      })
+
+    } catch (error) {
+      console.error('Error creating budget:', error)
+      throw error
+    }
+  }
 }

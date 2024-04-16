@@ -51,6 +51,10 @@ export class Budget {
   @ApiProperty({ example: BudgetPaymentMethodEnum.CREDIT, enum: BudgetPaymentMethodEnum, required: false, default: BudgetPaymentMethodEnum.DEBIT }) paymentMethod?: BudgetPaymentMethodEnum
   @ApiProperty({ type: RecurrenceHistory }) recurrenceHistory?: RecurrenceHistory
 
+  constructor(data: Budget) {
+    Object.assign(this, data)
+  }
+
   public static mock(): Budget {
     const data = {
       id: '21f58a70-3d62-4524-b564-3464d85e9e0d',

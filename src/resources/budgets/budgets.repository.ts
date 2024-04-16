@@ -4,6 +4,23 @@ import { Budget } from './budgets.entity'
 export interface BudgetCreateDto extends CreateBudgetDto {
   id: string
   userId: string
+  isRecurrent: boolean
+  recurrenceHistory : {
+    activePeriods: [
+      {
+        startDate?: Date,
+        endDate?: Date
+      }
+    ],
+    registers: [
+      {
+        id: string,
+        value: number,
+        date?: Date,
+        checked: boolean
+      }
+    ]
+  }
 }
 
 export abstract class BudgetsRepository {

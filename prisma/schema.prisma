@@ -23,7 +23,7 @@ model User {
   Preferences UserPreference @relation(fields: [userPreferenceId], references: [id])
   ToDos       ToDo[]
   StockOrders StockOrder[]
-  BudgetItens BudgetItem[]
+  // BudgetItens BudgetItem[]
 
   @@map("users")
 }
@@ -130,15 +130,15 @@ model OrderGroup {
   @@map("order_groups")
 }
 
-model BudgetItem {
-  id       String  @id @default(uuid())
-  userId   String  @map("user_id")
-  isIncome Boolean @map("is_income")
+// model BudgetItem {
+//   id       String  @id @default(uuid())
+//   userId   String  @map("user_id")
+//   isIncome Boolean @map("is_income")
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
 
-  User User @relation(fields: [userId], references: [id])
+//   User User @relation(fields: [userId], references: [id])
 
-  @@map("budget_incomes")
-}
+//   @@map("budget_incomes")
+// }

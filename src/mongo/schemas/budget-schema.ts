@@ -1,11 +1,11 @@
 import { Schema } from 'mongoose'
 import { Budget } from 'src/resources/budgets/budgets.entity'
 
-interface IMongoBudgetHistorySchema extends Budget {
+export interface IMongoBudgetSchema extends Budget {
   _id: string
 }
 
-export const budgetHistorySchema = new Schema<IMongoBudgetHistorySchema>(
+export const budgetSchema = new Schema<IMongoBudgetSchema>(
   {
     _id: { type: String, required: true },
     description: { type: String, required: true },
@@ -14,9 +14,9 @@ export const budgetHistorySchema = new Schema<IMongoBudgetHistorySchema>(
     isRecurrent: { type: Boolean, required: true },
     paymentMethod: { type: String },
     recurrenceHistory: {
-      active: [
+      activePeriods: [
         {
-          startDate: { type: Date, required: true },
+          startDate: { type: Date },
           endDate: { type: Date }
         }
       ],
@@ -24,7 +24,7 @@ export const budgetHistorySchema = new Schema<IMongoBudgetHistorySchema>(
         {
           id: { type: String, required: true },
           value: { type: Number, required: true },
-          date: { type: Date, required: true },
+          date: { type: Date, required: false },
           checked: { type: Boolean, required: true }
         }
       ]
