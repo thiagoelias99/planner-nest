@@ -42,9 +42,28 @@ export class MongoBudgetsRepository extends BudgetsRepository {
 
   async find(userId: string): Promise<Budget[]> {
     try {
-      return []
+      const budgets = await this.budgetModel.find({ userId }).lean()
+
+      return budgets.map((budget: any) => new Budget({
+        ...budget,
+        id: budget._id,
+        recurrenceHistory: {
+          activePeriods: budget.recurrenceHistory.activePeriods.map((activePeriod: any) => ({
+            startDate: activePeriod.startDate,
+            endDate: activePeriod.endDate
+          })),
+          registers: budget.recurrenceHistory.registers.map((register: any) => ({
+            id: register.id,
+            value: register.value,
+            date: register.date,
+            consolidated: register.checked
+          }))
+        }
+      }))
+
     } catch (error) {
-      
+      console.error('Error getting budget:', error)
+      throw error
     }
   }
 }
