@@ -1,10 +1,11 @@
-import { BadRequestException, Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 import { BudgetsService } from './budgets.service'
 import { Budget } from './budgets.entity'
 import { AuthGuard, UserRequest } from '../../guards/auth.guard'
 import { CreateBudgetDto } from './dto/create-budget.dto'
+import { GetBudgetQueryDto } from './dto/get-budget-query.dto'
 
 @Controller('budgets')
 @ApiTags('Budgets')
@@ -44,7 +45,10 @@ export class BudgetsController {
     description: 'Ok',
     type: [Budget]
   })
-  async find(@Req() req: UserRequest) {
+  async find(
+    @Req() req: UserRequest,
+    @Query() query: GetBudgetQueryDto
+  ) {
     return this.budgetsService.find(req.user.id)
   }
 }

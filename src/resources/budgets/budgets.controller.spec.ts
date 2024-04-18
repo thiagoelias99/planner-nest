@@ -257,5 +257,51 @@ describe('BudgetsController', () => {
       // Assert
       expect(response.body).toBeInstanceOf(Array)
     })
+
+    it('should return error if invalid month options is passed in query', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets?month=12')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if invalid month options is passed in query', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets?month=abc')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return array if valid month (00) options is passed in query', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets?month=00')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array)
+    })
+
+    it('should return array if valid month (11) options is passed in query', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets?month=11')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array)
+    })
   })
 })
