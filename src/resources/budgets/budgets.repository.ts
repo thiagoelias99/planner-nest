@@ -25,4 +25,5 @@ export interface BudgetCreateDto extends CreateBudgetDto {
 
 export abstract class BudgetsRepository {
   abstract create(data: BudgetCreateDto): Promise<Budget>
+  abstract find(userId: string): Promise<Budget[]>
 }

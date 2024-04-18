@@ -27,6 +27,7 @@ describe('BudgetsController', () => {
           provide: BudgetsService,
           useValue: {
             create: jest.fn().mockResolvedValue(mockBudgetResponseCreatedData),
+            find: jest.fn().mockResolvedValue([mockBudgetResponseCreatedData]),
           },
         },
       ],
@@ -72,164 +73,189 @@ describe('BudgetsController', () => {
     expect(budgetsService).toBeDefined()
   })
 
-  it('should deny access to unauthenticated users', async () => {
-    // Arrange
-    const data = { value: 100.99 }
+  describe('POST /budgets', () => {
+    it('should deny access to unauthenticated users', async () => {
+      // Arrange
+      const data = { value: 100.99 }
 
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .send(data)
-      .expect(401)
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .send(data)
+        .expect(401)
 
-    // Assert
-    expect(response.body).toMatchObject({ statusCode: 401, message: 'Invalid JWT token' })
+      // Assert
+      expect(response.body).toMatchObject({ statusCode: 401, message: 'Invalid JWT token' })
+    })
+
+    it('should create a new budget', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(mockCreateBudgetDtoData)
+        .expect(201)
+
+      // Assert
+      expect(response.body).toHaveProperty('id')
+    })
+
+    it('should return error message if no value is provided', async () => {
+      // Arrange
+      const data = mockCreateBudgetDtoData
+      delete data.value
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(data)
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+      expect(response.body.message).toContain('value must be a positive number')
+    })
+
+    it('should return error message if value is not a number', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: 'abc' })
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error message if value is not a positive number', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: -1 })
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if expectedDay is less than 1', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: 100, expectedDay: 0 })
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if expectedDay is greater than 31', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: 100, expectedDay: 32 })
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if startDate is not a valid date', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: 100, startDate: 'abc' })
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if endDate is not a valid date', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: 100, endDate: 'abc' })
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if endDate is provided without startDate', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: 100, endDate: '2021-01-01' })
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if endDate is before startDate', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: 100, startDate: '2021-01-01', endDate: '2020-01-01' })
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if paymentMethod is not a valid enum value', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: 100, paymentMethod: 'abc' })
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
   })
 
-  it('should create a new budget', async () => {
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send(mockCreateBudgetDtoData)
-      .expect(201)
+  describe('GET /budgets', () => {
+    it('should deny access to unauthenticated users', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets')
+        .expect(401)
 
-    // Assert
-    expect(response.body).toHaveProperty('id')
-  })
+      // Assert
+      expect(response.body).toMatchObject({ statusCode: 401, message: 'Invalid JWT token' })
+    })
 
-  it('should return error message if no value is provided', async () => {
-    // Arrange
-    const data = mockCreateBudgetDtoData
-    delete data.value
+    it('should return an array of budgets', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
 
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send(data)
-      .expect(400)
-
-    // Assert
-    expect(response.body).toHaveProperty('error')
-    expect(response.body).toHaveProperty('message')
-    expect(response.body.message).toContain('value must be a positive number')
-  })
-
-  it('should return error message if value is not a number', async () => {
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({value: 'abc'})
-      .expect(400)
-
-    // Assert
-    expect(response.body).toHaveProperty('error')
-    expect(response.body).toHaveProperty('message')
-  })
-
-  it('should return error message if value is not a positive number', async () => {
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({value: -1})
-      .expect(400)
-
-    // Assert
-    expect(response.body).toHaveProperty('error')
-    expect(response.body).toHaveProperty('message')
-  })
-
-  it('should return error if expectedDay is less than 1', async () => {
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({value: 100, expectedDay: 0})
-      .expect(400)
-
-    // Assert
-    expect(response.body).toHaveProperty('error')
-    expect(response.body).toHaveProperty('message')
-  })
-
-  it('should return error if expectedDay is greater than 31', async () => {
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({value: 100, expectedDay: 32})
-      .expect(400)
-
-    // Assert
-    expect(response.body).toHaveProperty('error')
-    expect(response.body).toHaveProperty('message')
-  })
-
-  it('should return error if startDate is not a valid date', async () => {
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({value: 100, startDate: 'abc'})
-      .expect(400)
-
-    // Assert
-    expect(response.body).toHaveProperty('error')
-    expect(response.body).toHaveProperty('message')
-  })
-
-  it('should return error if endDate is not a valid date', async () => {
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({value: 100, endDate: 'abc'})
-      .expect(400)
-
-    // Assert
-    expect(response.body).toHaveProperty('error')
-    expect(response.body).toHaveProperty('message')
-  })
-
-  it('should return error if endDate is provided without startDate', async () => {
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({value: 100, endDate: '2021-01-01'})
-      .expect(400)
-
-    // Assert
-    expect(response.body).toHaveProperty('error')
-    expect(response.body).toHaveProperty('message')
-  })
-
-  it('should return error if endDate is before startDate', async () => {
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({value: 100, startDate: '2021-01-01', endDate: '2020-01-01'})
-      .expect(400)
-
-    // Assert
-    expect(response.body).toHaveProperty('error')
-    expect(response.body).toHaveProperty('message')
-  })
-
-  it('should return error if paymentMethod is not a valid enum value', async () => {
-    // Act
-    const response = await request(app.getHttpServer())
-      .post('/budgets')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({value: 100, paymentMethod: 'abc'})
-      .expect(400)
-
-    // Assert
-    expect(response.body).toHaveProperty('error')
-    expect(response.body).toHaveProperty('message')
+      // Assert
+      expect(response.body).toBeInstanceOf(Array)
+    })
   })
 })

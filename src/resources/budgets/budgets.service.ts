@@ -44,8 +44,6 @@ export class BudgetsService {
       expectedDay = new Date().getDate()
     }
 
-    console.log('Creating budget with data:', data.startDate)
-
     const createdBudget = await this.budgetsRepository.create({
       id: randomUUID(),
       userId,
@@ -75,5 +73,9 @@ export class BudgetsService {
     })
 
     return createdBudget
+  }
+
+  async find(userId: string) {
+    return this.budgetsRepository.find(userId)
   }
 }

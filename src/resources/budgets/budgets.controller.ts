@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post, Req, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 import { BudgetsService } from './budgets.service'
@@ -33,5 +33,18 @@ export class BudgetsController {
     }
 
     return this.budgetsService.create(req.user.id, data)
+  }
+
+  @Get('')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get budgets from user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Ok',
+    type: [Budget]
+  })
+  async find(@Req() req: UserRequest) {
+    return this.budgetsService.find(req.user.id)
   }
 }

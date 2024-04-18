@@ -39,4 +39,12 @@ export class MongoBudgetsRepository extends BudgetsRepository {
       throw error
     }
   }
+
+  async find(userId: string): Promise<Budget[]> {
+    try {
+      return []
+    } catch (error) {
+      
+    }
+  }
 }
