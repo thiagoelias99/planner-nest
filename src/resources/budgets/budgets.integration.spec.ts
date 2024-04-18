@@ -3,11 +3,9 @@ import { Test, TestingModule } from '@nestjs/testing'
 import * as request from 'supertest'
 import { useContainer } from 'class-validator'
 
-import { BudgetsController } from './budgets.controller'
-import { BudgetsService } from './budgets.service'
 import { AppModule } from '../../app.module'
 import { CreateBudgetDto } from './dto/create-budget.dto'
-import { Budget, BudgetPaymentMethodEnum } from './budgets.entity'
+import { BudgetPaymentMethodEnum } from './budgets.entity'
 import { CreateUserDto } from '../users/dto/create-user.dto'
 
 describe('BudgetsIntegration', () => {
