@@ -11,16 +11,33 @@ export class BudgetsService {
   ) { }
 
   async create(userId: string, data: CreateBudgetDto) {
+    let isIncome: boolean = true
+    let consolidated: boolean = true
+
+    // Normalize isIncome
+    if (data.isIncome === undefined) {
+      isIncome = true
+    } else {
+      isIncome = data.isIncome
+    }
+
+    // Normalize consolidated
+    if (data.consolidated === undefined) {
+      consolidated = true
+    } else {
+      consolidated = data.consolidated
+    }
+
     const createdBudget = await this.budgetsRepository.create({
       id: randomUUID(),
       userId,
       isRecurrent: !!data.startDate,
       description: data.description || 'Extra',
       expectedDay: data.expectedDay || data.startDate?.getDate() || new Date().getDate(),
-      isIncome: data.isIncome || true,
+      isIncome,
       paymentMethod: data.paymentMethod || BudgetPaymentMethodEnum.DEBIT,
       value: data.value,
-      consolidated: !!data.consolidated,
+      consolidated: consolidated,
       recurrenceHistory: {
         activePeriods: [
           {
@@ -32,14 +49,12 @@ export class BudgetsService {
           {
             id: randomUUID(),
             value: data.value,
-            date: data.startDate,
-            checked: !!data.consolidated
+            date: data.startDate || new Date(),
+            checked: consolidated
           }
         ]
       }
     })
-
-    console.log('Budget created:', createdBudget)
 
     return createdBudget
   }

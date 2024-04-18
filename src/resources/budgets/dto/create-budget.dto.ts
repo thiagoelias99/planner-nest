@@ -12,7 +12,7 @@ export class CreateBudgetDto {
   @IsBoolean()
   @IsOptional()
   @ApiProperty({ required: false, default: true })
-  isIncome: boolean
+  isIncome?: boolean
 
   @IsString()
   @Length(1, 156)
@@ -30,11 +30,11 @@ export class CreateBudgetDto {
   @IsBoolean()
   @IsOptional()
   @ApiProperty({ required: false, default: true })
-  consolidated: boolean
+  consolidated?: boolean
 
   @IsDateString()
   @IsOptional()
-  @ApiProperty({ required: false, default: new Date().toISOString() })
+  @ApiProperty({ required: false, default: null })
   startDate?: Date
 
   @IsDateString()
