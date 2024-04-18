@@ -92,6 +92,8 @@ describe('BudgetsIntegration', () => {
       expect(response.body.currentValue).toBe(createData.value)
       expect(response.body.description).toBe(createData.description)
       expect(response.body.isRecurrent).toBeTruthy()
+      expect(response.body.isIncome).toBe(createData.isIncome)
+      expect(response.body.paymentMethod).toBe(createData.paymentMethod)
 
       expect(response.body).toHaveProperty('recurrenceHistory')
       expect(response.body.recurrenceHistory).toHaveProperty('registers')
