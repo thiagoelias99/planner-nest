@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { Exclude } from 'class-transformer'
 
 export enum BudgetPaymentMethodEnum {
   CREDIT = 'CREDIT',
@@ -43,6 +44,7 @@ export class RecurrenceHistory {
 
 export class Budget {
   @ApiProperty({ example: '21f58a70-3d62-4524-b564-3464d85e9e0d' }) id: string
+  @Exclude() userId: string
   @ApiProperty({ example: false }) isIncome: boolean
   @ApiProperty({ example: 'Salary' }) description: string
   @ApiProperty({ example: 1000 }) currentValue: number

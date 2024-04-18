@@ -8,6 +8,7 @@ export interface IMongoBudgetSchema extends Budget {
 export const budgetSchema = new Schema<IMongoBudgetSchema>(
   {
     _id: { type: String, required: true },
+    userId: { type: String, required: true },
     description: { type: String, required: true },
     currentValue: { type: Number, required: true },
     expectedDay: { type: Number, required: true },
