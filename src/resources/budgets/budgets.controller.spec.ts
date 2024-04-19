@@ -285,7 +285,7 @@ describe('BudgetsController', () => {
     it('should return array if valid month (00) options is passed in query', async () => {
       // Act
       const response = await request(app.getHttpServer())
-        .get('/budgets?month=00')
+        .get('/budgets?month=0')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200)
 

@@ -2,6 +2,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import * as request from 'supertest'
 import { useContainer } from 'class-validator'
+import * as moment from 'moment'
 
 import { AppModule } from '../../app.module'
 import { CreateBudgetDto } from './dto/create-budget.dto'
@@ -54,15 +55,15 @@ describe('BudgetsIntegration', () => {
     await app.close()
   })
 
-  afterEach(async () => {
-    if (createdIds.length === 0) { return }
-    else {
-      await budgetsService.deleteBudgets(createdIds)
-      createdIds = []
-    }
-  })
-
   describe('POST /budgets', () => {
+    afterAll(async () => {
+      if (createdIds.length === 0) { return }
+      else {
+        await budgetsService.deleteBudgets(createdIds)
+        createdIds = []
+      }
+    })
+
     it('should create a budget with only value', async () => {
       const createData: CreateBudgetDto = {
         value: 1000.99,
@@ -129,6 +130,155 @@ describe('BudgetsIntegration', () => {
       expect(response.body.recurrenceHistory.activePeriods[0].endDate).toBe(createData.endDate.toISOString())
 
       createdIds.push(response.body.id)
+    })
+  })
+
+  describe('GET /budgets', () => {
+    const budgetCreate1: CreateBudgetDto = {
+      value: 1000,
+      description: 'Budget 1 - Unique',
+    }
+
+    const budgetCreate2: CreateBudgetDto = {
+      value: 2000,
+      description: 'Budget 2 - Recurrent Start & End',
+      startDate: moment().subtract(1, 'year').toDate(),
+      endDate: moment().add(1, 'year').toDate()
+    }
+
+    const budgetCreate3: CreateBudgetDto = {
+      value: 3000,
+      description: 'Budget 3 - Recurrent Start only',
+      startDate: moment().subtract(6, 'month').toDate(),
+    }
+
+    const budgetCreate4: CreateBudgetDto = {
+      value: 4000,
+      description: 'Budget 4 - Recurrent Outdated',
+      startDate: moment().subtract(6, 'month').toDate(),
+      endDate: moment().subtract(4, 'month').toDate()
+    }
+
+    beforeAll(async () => {
+      await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(budgetCreate1)
+        .then(response => createdIds.push(response.body.id))
+
+      await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(budgetCreate2)
+        .then(response => createdIds.push(response.body.id))
+
+      await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(budgetCreate3)
+        .then(response => createdIds.push(response.body.id))
+
+      await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(budgetCreate4)
+        .then(response => createdIds.push(response.body.id))
+    })
+
+    afterAll(async () => {
+      if (createdIds.length === 0) { return }
+      else {
+        await budgetsService.deleteBudgets(createdIds)
+        createdIds = []
+      }
+    })
+
+    it('should return all budgets from user', () => {
+      return request(app.getHttpServer())
+        .get('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
+        .then(response => {
+          expect(response.body).toBeInstanceOf(Array)
+          expect(response.body).toHaveLength(4)
+        })
+    })
+
+    it('should return budget from current month', () => {
+      //Budget 1 - Unique
+      //Budget 2 - Recurrent Start & End
+      //Budget 3 - Recurrent Start only
+      return request(app.getHttpServer())
+        .get('/budgets')
+        .query({ month: moment().month() })
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
+        .then(response => {
+          expect(response.body).toBeInstanceOf(Array)
+          expect(response.body).toHaveLength(3)
+          expect(response.body).toContainEqual(expect.objectContaining({ description: budgetCreate1.description }))
+          expect(response.body).toContainEqual(expect.objectContaining({ description: budgetCreate2.description }))
+          expect(response.body).toContainEqual(expect.objectContaining({ description: budgetCreate3.description }))
+        })
+    })
+
+    it('should return budget from next month', () => {
+      //Budget 2 - Recurrent Start & End
+      //Budget 3 - Recurrent Start only
+      return request(app.getHttpServer())
+        .get('/budgets')
+        .query({ month: moment().add(1, 'month').month(), year: moment().add(1, 'month').year()})
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
+        .then(response => {
+          expect(response.body).toBeInstanceOf(Array)
+          expect(response.body).toHaveLength(2)
+          expect(response.body).toContainEqual(expect.objectContaining({ description: budgetCreate2.description }))
+          expect(response.body).toContainEqual(expect.objectContaining({ description: budgetCreate3.description }))
+        })
+    })
+    
+    it('should return budget from previous month', () => {
+      //Budget 2 - Recurrent Start & End
+      //Budget 3 - Recurrent Start only
+      return request(app.getHttpServer())
+        .get('/budgets')
+        .query({ month: moment().subtract(1, 'month').month(), year: moment().subtract(1, 'month').year()})
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
+        .then(response => {
+          expect(response.body).toBeInstanceOf(Array)
+          expect(response.body).toHaveLength(2)
+          expect(response.body).toContainEqual(expect.objectContaining({ description: budgetCreate2.description }))
+          expect(response.body).toContainEqual(expect.objectContaining({ description: budgetCreate3.description }))
+        })
+    })
+
+    it('should return budget from this moth, 10 year in the future', () => {
+      //Budget 3 - Recurrent Start only
+      return request(app.getHttpServer())
+        .get('/budgets')
+        .query({ month: moment().month(), year: moment().add(10, 'year').year() })
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
+        .then(response => {
+          expect(response.body).toBeInstanceOf(Array)
+          expect(response.body).toHaveLength(1)
+          expect(response.body).toContainEqual(expect.objectContaining({ description: budgetCreate3.description }))
+        })
+    })
+
+    it('should return budget from 2 years ago', () => {
+      //None
+      return request(app.getHttpServer())
+        .get('/budgets')
+        .query({ month: moment().month(), year: moment().subtract(2, 'year').year() })
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
+        .then(response => {
+          expect(response.body).toBeInstanceOf(Array)
+          expect(response.body).toHaveLength(0)
+        })
     })
   })
 })
