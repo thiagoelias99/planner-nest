@@ -1,5 +1,6 @@
 /* eslint-disable indent */
-import { IsEnum, IsOptional } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
+import { IsEnum, IsOptional, IsString } from 'class-validator'
 
 export enum MonthsEnum {
   January = '00',
@@ -19,6 +20,12 @@ export enum MonthsEnum {
 export class GetBudgetQueryDto {
   @IsEnum(MonthsEnum)
   @IsOptional()
+  @ApiProperty({ enum: MonthsEnum, required: false })
   month?: string
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({ example: '2024', required: false })
+  year?: string
 }
 

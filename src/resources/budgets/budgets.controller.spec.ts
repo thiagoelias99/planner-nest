@@ -303,5 +303,17 @@ describe('BudgetsController', () => {
       // Assert
       expect(response.body).toBeInstanceOf(Array)
     })
+
+    it('should return error if invalid options is passed in query', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets?invalid=11')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
   })
 })

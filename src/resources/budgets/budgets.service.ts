@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common'
+import * as moment from 'moment'
 import { BudgetsRepository } from './budgets.repository'
 import { CreateBudgetDto } from './dto/create-budget.dto'
 import { randomUUID } from 'crypto'
 import { BudgetPaymentMethodEnum } from './budgets.entity'
+import { GetBudgetQueryDto } from './dto/get-budget-query.dto'
 
 @Injectable()
 export class BudgetsService {
@@ -75,7 +77,38 @@ export class BudgetsService {
     return createdBudget
   }
 
-  async find(userId: string) {
-    return this.budgetsRepository.find(userId)
+  async find(userId: string, { month, year }: GetBudgetQueryDto) {
+    const budgets = await this.budgetsRepository.find(userId)
+
+    if (!month) {
+      return budgets
+    }
+
+    // Filter by month and year
+    let normalizedMonth: Number = parseInt(month) + 1
+    let normalizedYear = new Date().getFullYear()
+
+    if (year) {
+      normalizedYear = parseInt(year)
+    }
+
+    const firstMonthDay = moment(`${normalizedYear}-${normalizedMonth}-01`, 'YYYY-MM-DD')
+    const lastMonthDay = firstMonthDay.clone().endOf('month')
+
+    return budgets.filter(budget => {
+      const hasRegister = budget.recurrenceHistory.registers.some(register => {
+        return moment(register.date).isBetween(firstMonthDay, lastMonthDay)
+      })
+
+      const hasActivePeriod = budget.recurrenceHistory.activePeriods.some(period => {
+        if (!period.startDate) {
+          return false
+        }
+
+        return moment(period.startDate).isBefore(lastMonthDay) && (!period.endDate || moment(period.endDate).isAfter(firstMonthDay))
+      })
+
+      return hasRegister || hasActivePeriod
+    })
   }
 }

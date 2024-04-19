@@ -49,6 +49,6 @@ export class BudgetsController {
     @Req() req: UserRequest,
     @Query() query: GetBudgetQueryDto
   ) {
-    return this.budgetsService.find(req.user.id)
+    return this.budgetsService.find(req.user.id, query)
   }
 }
