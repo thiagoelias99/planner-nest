@@ -111,4 +111,8 @@ export class BudgetsService {
       return hasRegister || hasActivePeriod
     })
   }
+
+  async deleteBudgets(ids: string[]) {
+    return this.budgetsRepository.deleteBudgets(ids)
+  }
 }

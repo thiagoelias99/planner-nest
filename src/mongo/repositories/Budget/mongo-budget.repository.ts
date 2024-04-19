@@ -66,4 +66,17 @@ export class MongoBudgetsRepository extends BudgetsRepository {
       throw error
     }
   }
+
+  async deleteBudgets(ids: string[]): Promise<any> {
+    try {
+      return this.budgetModel.deleteMany({
+        _id: {
+          $in: ids
+        }
+      })
+    } catch (error) {
+      console.error('Error getting budget:', error)
+      throw error
+    }
+  }
 }

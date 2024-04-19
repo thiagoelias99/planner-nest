@@ -7,10 +7,13 @@ import { AppModule } from '../../app.module'
 import { CreateBudgetDto } from './dto/create-budget.dto'
 import { BudgetPaymentMethodEnum } from './budgets.entity'
 import { CreateUserDto } from '../users/dto/create-user.dto'
+import { BudgetsService } from './budgets.service'
 
 describe('BudgetsIntegration', () => {
   let app: INestApplication
   let accessToken: string
+  let createdIds: string[]
+  let budgetsService: BudgetsService
 
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -27,6 +30,8 @@ describe('BudgetsIntegration', () => {
     )
     useContainer(app.select(AppModule), { fallbackOnErrors: true })
 
+    budgetsService = moduleRef.get<BudgetsService>(BudgetsService)
+
     await app.init()
 
     //Register Test User
@@ -40,10 +45,21 @@ describe('BudgetsIntegration', () => {
       .post('/login')
       .send({ password: userLoginData.password, email: userLoginData.email })
     accessToken = response.body.accessToken
+
+    //Initial config
+    createdIds = []
   })
 
   afterAll(async () => {
     await app.close()
+  })
+
+  afterEach(async () => {
+    if (createdIds.length === 0) { return }
+    else {
+      await budgetsService.deleteBudgets(createdIds)
+      createdIds = []
+    }
   })
 
   describe('POST /budgets', () => {
@@ -69,6 +85,8 @@ describe('BudgetsIntegration', () => {
       expect(response.body.recurrenceHistory.registers[0]).toHaveProperty('value')
       expect(response.body.recurrenceHistory.registers[0].value).toBe(createData.value)
       expect(response.body.description).toBe('Extra')
+
+      createdIds.push(response.body.id)
     })
 
     it('should create a budget with all fields', async () => {
@@ -110,8 +128,7 @@ describe('BudgetsIntegration', () => {
       expect(response.body.recurrenceHistory.activePeriods[0]).toHaveProperty('endDate')
       expect(response.body.recurrenceHistory.activePeriods[0].endDate).toBe(createData.endDate.toISOString())
 
-
-
+      createdIds.push(response.body.id)
     })
   })
 })
