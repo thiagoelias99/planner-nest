@@ -316,4 +316,64 @@ describe('BudgetsController', () => {
       expect(response.body).toHaveProperty('message')
     })
   })
+
+  describe('GET /budgets/summary/:year/:month', () => {
+    it('should deny access to unauthenticated users', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets/summary/2021/01')
+        .expect(401)
+
+      // Assert
+      expect(response.body).toMatchObject({ statusCode: 401, message: 'Invalid JWT token' })
+    })
+
+    it('should return error if no parameters are passed', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets/summary')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(404)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if invalid year is passed', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets/summary/abc/01')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if invalid month is passed', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets/summary/2021/abc')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if invalid month (12) options is passed', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/budgets/summary/2021/12')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+  })
 })

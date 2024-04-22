@@ -74,3 +74,13 @@ export class Budget {
     return data as Budget
   }
 }
+
+export class BudgetSimplified{
+  @ApiProperty() id: string
+  @ApiProperty() parentId: string
+  @ApiProperty() description: string
+  @ApiProperty() value: number
+  @ApiProperty({ example: new Date().toISOString() }) date: Date
+  @ApiProperty() isChecked: boolean
+  @ApiProperty({ enum: BudgetPaymentMethodEnum}) paymentMethod: BudgetPaymentMethodEnum
+}
