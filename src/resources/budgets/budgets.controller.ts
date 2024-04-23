@@ -77,6 +77,6 @@ export class BudgetsController {
       throw new BadRequestException('Month must be between 0 and 11')
     }
 
-    return { year, month }
+    return this.budgetsService.summary(req.user.id, year, month)
   }
 }

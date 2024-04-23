@@ -27,4 +27,5 @@ export abstract class BudgetsRepository {
   abstract create(data: BudgetCreateDto): Promise<Budget>
   abstract find(userId: string): Promise<Budget[]>
   abstract deleteBudgets(ids: string[]): Promise<any>
+  abstract addRegister(budgetId: string, value: number, date: Date): Promise<string>
 }

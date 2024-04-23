@@ -3,8 +3,9 @@ import * as moment from 'moment'
 import { BudgetsRepository } from './budgets.repository'
 import { CreateBudgetDto } from './dto/create-budget.dto'
 import { randomUUID } from 'crypto'
-import { BudgetPaymentMethodEnum } from './budgets.entity'
+import { Budget, BudgetPaymentMethodEnum, BudgetSimplified } from './budgets.entity'
 import { GetBudgetQueryDto } from './dto/get-budget-query.dto'
+import { BudgetSummary } from './dto/summary.dto'
 
 @Injectable()
 export class BudgetsService {
@@ -114,5 +115,76 @@ export class BudgetsService {
 
   async deleteBudgets(ids: string[]) {
     return this.budgetsRepository.deleteBudgets(ids)
+  }
+
+  async summary(userId: string, year: number, month: number) {
+    let budgets = await this.find(userId, {
+      month: month.toString(),
+      year: year.toString()
+    })
+
+    //Verify in registers if already there date in the month, if not, create a register with the value and checked false
+    await Promise.all(
+      budgets.map(budget => {
+        const registers = budget.recurrenceHistory.registers.filter(register => {
+          return moment(register.date).month() === month && moment(register.date).year() === year
+        })
+
+        if (registers.length === 0) {
+          return this.addRegister(budget.id, budget.currentValue, new Date(year, month, budget.expectedDay))
+        } else {
+          return
+        }
+      })
+    )
+
+    //Get updated budgets
+    budgets = await this.find(userId, {
+      month: month.toString(),
+      year: year.toString()
+    })
+
+    const incomes = this.filterBudgets(budgets, month, year, true)
+    const outcomes = this.filterBudgets(budgets, month, year, false)
+
+    //Calculate summary
+    const summary: BudgetSummary = {
+      incomes,
+      outcomes,
+      predictedIncomeValue: incomes.reduce((acc, curr) => acc + curr.value, 0),
+      predictedOutcomeValue: outcomes.reduce((acc, curr) => acc + curr.value, 0),
+      predictedBalance: incomes.reduce((acc, curr) => acc + curr.value, 0) - outcomes.reduce((acc, curr) => acc + curr.value, 0),
+      actualIncomeValue: incomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0),
+      actualOutcomeValue: outcomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0),
+      actualBalance: incomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0) - outcomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0)
+    }
+
+    return summary
+  }
+
+  async addRegister(budgetId: string, value: number, date: Date) {
+    return this.budgetsRepository.addRegister(budgetId, value, date)
+  }
+
+  filterBudgets(budgets: Budget[], month: number, year: number, income: boolean) {
+    const incomeBudgets = budgets.filter(budget => budget.isIncome === income)
+    //Select register from selected date
+    return incomeBudgets.map(budget => {
+      const budgetFromThisMonth = budget.recurrenceHistory.registers.find(register => {
+        return moment(register.date).month() === month && moment(register.date).year() === year
+      })
+
+      const simplified: BudgetSimplified = {
+        id: budgetFromThisMonth.id,
+        parentId: budget.id,
+        description: budget.description,
+        value: budgetFromThisMonth.value,
+        date: budgetFromThisMonth.date,
+        isChecked: budgetFromThisMonth.consolidated,
+        paymentMethod: budget.paymentMethod
+      }
+
+      return simplified
+    })
   }
 }

@@ -3,6 +3,7 @@ import { Connection } from 'mongoose'
 import { BudgetCreateDto, BudgetsRepository } from '../../../resources/budgets/budgets.repository'
 import { Budget } from '../../../resources/budgets/budgets.entity'
 import { IMongoBudgetSchema, budgetSchema } from '../../schemas/budget-schema'
+import { randomUUID } from 'node:crypto'
 
 @Injectable()
 export class MongoBudgetsRepository extends BudgetsRepository {
@@ -76,6 +77,30 @@ export class MongoBudgetsRepository extends BudgetsRepository {
       })
     } catch (error) {
       console.error('Error getting budget:', error)
+      throw error
+    }
+  }
+
+  async addRegister(budgetId: string, value: number, date: Date): Promise<string> {
+    try {
+      const registerId = randomUUID()
+      await this.budgetModel.updateOne(
+        { _id: budgetId },
+        {
+          $push: {
+            'recurrenceHistory.registers': {
+              id: registerId,
+              value,
+              date,
+              checked: false
+            }
+          }
+        }
+      )
+
+      return registerId
+    } catch (error) {
+      console.error('Error adding register:', error)
       throw error
     }
   }
