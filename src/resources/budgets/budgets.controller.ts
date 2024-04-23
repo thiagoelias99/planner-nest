@@ -96,16 +96,16 @@ export class BudgetsController {
     @Body() data: UpdateBudgetRegisterDto
   ) {
 
-    //Check if id is UUID
-    if (!budgetId.match(/^[0-9a-fA-F]{24}$/)) {
+    //Check if id is UUIDv4
+    if (budgetId.length !== 36) {
       throw new BadRequestException('Invalid budget id')
     }
 
     //Check if subId is UUID
-    if (!registerId.match(/^[0-9a-fA-F]{24}$/)) {
+    if (registerId.length !== 36) {
       throw new BadRequestException('Invalid register id')
     }
 
-    return { budgetId, registerId, ...data }
+    return this.budgetsService.updateBudgetRegister(req.user.id, budgetId, registerId, data)
   }
 }

@@ -9,6 +9,7 @@ import { CreateBudgetDto } from './dto/create-budget.dto'
 import { BudgetPaymentMethodEnum } from './budgets.entity'
 import { CreateUserDto } from '../users/dto/create-user.dto'
 import { BudgetsService } from './budgets.service'
+import { BudgetSummary } from './dto/summary.dto'
 
 describe('BudgetsIntegration', () => {
   let app: INestApplication
@@ -227,7 +228,7 @@ describe('BudgetsIntegration', () => {
       //Budget 3 - Recurrent Start only
       return request(app.getHttpServer())
         .get('/budgets')
-        .query({ month: moment().add(1, 'month').month(), year: moment().add(1, 'month').year()})
+        .query({ month: moment().add(1, 'month').month(), year: moment().add(1, 'month').year() })
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200)
         .then(response => {
@@ -237,13 +238,13 @@ describe('BudgetsIntegration', () => {
           expect(response.body).toContainEqual(expect.objectContaining({ description: budgetCreate3.description }))
         })
     })
-    
+
     it('should return budget from previous month', () => {
       //Budget 2 - Recurrent Start & End
       //Budget 3 - Recurrent Start only
       return request(app.getHttpServer())
         .get('/budgets')
-        .query({ month: moment().subtract(1, 'month').month(), year: moment().subtract(1, 'month').year()})
+        .query({ month: moment().subtract(1, 'month').month(), year: moment().subtract(1, 'month').year() })
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200)
         .then(response => {
@@ -279,6 +280,227 @@ describe('BudgetsIntegration', () => {
           expect(response.body).toBeInstanceOf(Array)
           expect(response.body).toHaveLength(0)
         })
+    })
+  })
+
+  describe('PATCH /budgets/:id/register/:subId', () => {
+    const budgetCreate1: CreateBudgetDto = {
+      value: 1000,
+      description: 'Patch Budget 1',
+      startDate: new Date('2024-05-09'),
+      // endDate: new Date('2024-05-09'),
+    }
+
+    let originalBudgetSummary: BudgetSummary = null
+
+    beforeAll(async () => {
+      await request(app.getHttpServer())
+        .post('/budgets')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(budgetCreate1)
+        .then(response => createdIds.push(response.body.id))
+
+      await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => originalBudgetSummary = response.body)
+    })
+
+    afterAll(async () => {
+      if (createdIds.length === 0) { return }
+      else {
+        await budgetsService.deleteBudgets(createdIds)
+        createdIds = []
+      }
+    })
+
+    it('should update register value', async () => {
+      const registerId = originalBudgetSummary.incomes[0].id
+      const newValue = 2000
+
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: newValue })
+        .expect(200)
+
+      const updatedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(updatedBudgetSummary.incomes[0].value).toBe(newValue)
+      expect(updatedBudgetSummary.incomes[0].date).toBe(originalBudgetSummary.incomes[0].date)
+      expect(updatedBudgetSummary.incomes[0].isChecked).toBe(originalBudgetSummary.incomes[0].isChecked)
+
+      //Revert changes
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: originalBudgetSummary.incomes[0].value })
+        .expect(200)
+
+      const revertedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(revertedBudgetSummary.incomes[0].value).toBe(originalBudgetSummary.incomes[0].value)
+    })
+
+    it('should update register date', async () => {
+      const registerId = originalBudgetSummary.incomes[0].id
+      const newDate = new Date('2024-05-18')
+
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ date: newDate.toISOString() })
+        .expect(200)
+
+      const updatedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(updatedBudgetSummary.incomes[0].value).toBe(originalBudgetSummary.incomes[0].value)
+      expect(updatedBudgetSummary.incomes[0].date).toBe(newDate.toISOString())
+      expect(updatedBudgetSummary.incomes[0].isChecked).toBe(originalBudgetSummary.incomes[0].isChecked)
+
+      //Revert changes
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ date: originalBudgetSummary.incomes[0].date })
+        .expect(200)
+
+      const revertedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(revertedBudgetSummary.incomes[0].date).toBe(originalBudgetSummary.incomes[0].date)
+    })
+
+    it('should update register isChecked', async () => {
+      const registerId = originalBudgetSummary.incomes[0].id
+      const newChecked = true
+
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ checked: newChecked })
+        .expect(200)
+
+      const updatedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(updatedBudgetSummary.incomes[0].value).toBe(originalBudgetSummary.incomes[0].value)
+      expect(updatedBudgetSummary.incomes[0].date).toBe(originalBudgetSummary.incomes[0].date)
+      expect(updatedBudgetSummary.incomes[0].isChecked).toBe(newChecked)
+
+      //Revert changes
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ checked: originalBudgetSummary.incomes[0].isChecked })
+        .expect(200)
+
+      const revertedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(revertedBudgetSummary.incomes[0].isChecked).toBe(originalBudgetSummary.incomes[0].isChecked)
+    })
+
+    it('should update value of a checked register', async () => {
+      const registerId = originalBudgetSummary.incomes[0].id
+      const newValue = 999.99
+
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ checked: true })
+        .expect(200)
+
+      const updatedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(updatedBudgetSummary.incomes[0].value).toBe(originalBudgetSummary.incomes[0].value)
+      expect(updatedBudgetSummary.incomes[0].isChecked).toBeTruthy()
+
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: newValue })
+        .expect(200)
+
+      const updatedBudgetSummary2 = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(updatedBudgetSummary2.incomes[0].value).toBe(newValue)
+      expect(updatedBudgetSummary2.incomes[0].isChecked).toBeTruthy()
+
+      //Revert changes
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: originalBudgetSummary.incomes[0].value, checked: originalBudgetSummary.incomes[0].isChecked })
+        .expect(200)
+
+      const revertedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(revertedBudgetSummary.incomes[0].value).toBe(originalBudgetSummary.incomes[0].value)
+      expect(revertedBudgetSummary.incomes[0].date).toBe(originalBudgetSummary.incomes[0].date)
+      expect(revertedBudgetSummary.incomes[0].isChecked).toBe(originalBudgetSummary.incomes[0].isChecked)
+    })
+
+    it('should update all fields of register', async () => {
+      const registerId = originalBudgetSummary.incomes[0].id
+      const newValue = 2000
+      const newDate = new Date('2024-05-18')
+      const newChecked = true
+
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: newValue, date: newDate.toISOString(), checked: newChecked })
+        .expect(200)
+
+      const updatedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(updatedBudgetSummary.incomes[0].value).toBe(newValue)
+      expect(updatedBudgetSummary.incomes[0].date).toBe(newDate.toISOString())
+      expect(updatedBudgetSummary.incomes[0].isChecked).toBe(newChecked)
+
+      //Revert changes
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: originalBudgetSummary.incomes[0].value, date: originalBudgetSummary.incomes[0].date, checked: originalBudgetSummary.incomes[0].isChecked })
+        .expect(200)
+
+      const revertedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(revertedBudgetSummary.incomes[0].value).toBe(originalBudgetSummary.incomes[0].value)
+      expect(revertedBudgetSummary.incomes[0].date).toBe(originalBudgetSummary.incomes[0].date)
+      expect(revertedBudgetSummary.incomes[0].isChecked).toBe(originalBudgetSummary.incomes[0].isChecked)
     })
   })
 })

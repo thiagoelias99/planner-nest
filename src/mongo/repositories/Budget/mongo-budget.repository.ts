@@ -1,9 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { Connection } from 'mongoose'
 import { BudgetCreateDto, BudgetsRepository } from '../../../resources/budgets/budgets.repository'
 import { Budget } from '../../../resources/budgets/budgets.entity'
 import { IMongoBudgetSchema, budgetSchema } from '../../schemas/budget-schema'
 import { randomUUID } from 'node:crypto'
+import { UpdateBudgetRegisterDto } from 'src/resources/budgets/dto/update-register.dto'
 
 @Injectable()
 export class MongoBudgetsRepository extends BudgetsRepository {
@@ -101,6 +102,32 @@ export class MongoBudgetsRepository extends BudgetsRepository {
       return registerId
     } catch (error) {
       console.error('Error adding register:', error)
+      throw error
+    }
+  }
+
+  async updateBudgetRegister(userId: string, budgetId: string, registerId: string, data: UpdateBudgetRegisterDto): Promise<any> {
+    console.log(data)
+
+    try {
+      //Verify if user has permission to update the register
+      const budget = await this.budgetModel.findOne({ _id: budgetId, userId }).lean()
+      if (!budget) {
+        throw new BadRequestException('Not allowed to update this register')
+      }
+
+      await this.budgetModel.updateOne(
+        { _id: budgetId, 'recurrenceHistory.registers.id': registerId },
+        {
+          $set: {
+            'recurrenceHistory.registers.$.value': data.value,
+            'recurrenceHistory.registers.$.date': data.date,
+            'recurrenceHistory.registers.$.checked': data.checked
+          }
+        }
+      )
+    } catch (error) {
+      console.error('Error updating register:', error)
       throw error
     }
   }

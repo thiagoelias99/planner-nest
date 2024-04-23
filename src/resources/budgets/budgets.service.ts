@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto'
 import { Budget, BudgetPaymentMethodEnum, BudgetSimplified } from './budgets.entity'
 import { GetBudgetQueryDto } from './dto/get-budget-query.dto'
 import { BudgetSummary } from './dto/summary.dto'
+import { UpdateBudgetRegisterDto } from './dto/update-register.dto'
 
 @Injectable()
 export class BudgetsService {
@@ -186,5 +187,9 @@ export class BudgetsService {
 
       return simplified
     })
+  }
+
+  async updateBudgetRegister(userId: string,budgetId: string, registerId: string, data: UpdateBudgetRegisterDto) {
+    return this.budgetsRepository.updateBudgetRegister(userId, budgetId, registerId, data)
   }
 }

@@ -1,5 +1,6 @@
 import { CreateBudgetDto } from './dto/create-budget.dto'
 import { Budget } from './budgets.entity'
+import { UpdateBudgetRegisterDto } from './dto/update-register.dto'
 
 export interface BudgetCreateDto extends CreateBudgetDto {
   id: string
@@ -28,4 +29,5 @@ export abstract class BudgetsRepository {
   abstract find(userId: string): Promise<Budget[]>
   abstract deleteBudgets(ids: string[]): Promise<any>
   abstract addRegister(budgetId: string, value: number, date: Date): Promise<string>
+  abstract updateBudgetRegister(userId: string,budgetId: string, registerId: string, data: UpdateBudgetRegisterDto): Promise<any>
 }
