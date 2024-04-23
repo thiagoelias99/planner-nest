@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 import { BudgetsService } from './budgets.service'
@@ -7,6 +7,7 @@ import { AuthGuard, UserRequest } from '../../guards/auth.guard'
 import { CreateBudgetDto } from './dto/create-budget.dto'
 import { GetBudgetQueryDto } from './dto/get-budget-query.dto'
 import { BudgetSummary } from './dto/summary.dto'
+import { UpdateBudgetRegisterDto } from './dto/update-register.dto'
 
 @Controller('budgets')
 @ApiTags('Budgets')
@@ -78,5 +79,22 @@ export class BudgetsController {
     }
 
     return this.budgetsService.summary(req.user.id, year, month)
+  }
+
+  @Patch(':id/register/:subId')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update checked, value, date or delete a register of budget' })
+  @ApiResponse({
+    status: 200,
+    description: 'Ok'
+  })
+  async updateChecked(
+    @Req() req: UserRequest,
+    @Param('id') budgetId: string,
+    @Param('subId') registerId: string,
+    @Body() data: UpdateBudgetRegisterDto
+  ) {
+    return { budgetId, registerId, ...data }
   }
 }
