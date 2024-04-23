@@ -89,12 +89,23 @@ export class BudgetsController {
     status: 200,
     description: 'Ok'
   })
-  async updateChecked(
+  async updateBudgetRegister(
     @Req() req: UserRequest,
     @Param('id') budgetId: string,
     @Param('subId') registerId: string,
     @Body() data: UpdateBudgetRegisterDto
   ) {
+
+    //Check if id is UUID
+    if (!budgetId.match(/^[0-9a-fA-F]{24}$/)) {
+      throw new BadRequestException('Invalid budget id')
+    }
+
+    //Check if subId is UUID
+    if (!registerId.match(/^[0-9a-fA-F]{24}$/)) {
+      throw new BadRequestException('Invalid register id')
+    }
+
     return { budgetId, registerId, ...data }
   }
 }

@@ -376,4 +376,53 @@ describe('BudgetsController', () => {
       expect(response.body).toHaveProperty('message')
     })
   })
+
+  describe('PATCH /:id/register/:subId', () => {
+    it('should deny access to unauthenticated users', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .patch('/budgets/1/register/1')
+        .expect(401)
+
+      // Assert
+      expect(response.body).toMatchObject({ statusCode: 401, message: 'Invalid JWT token' })
+    })
+
+    it('should return error if invalid id is passed', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .patch('/budgets/abc/register/1')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if invalid subId is passed', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .patch('/budgets/1/register/abc')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should return error if negative value is passed', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .patch('/budgets/1/register/1')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ value: -1 })
+        .expect(400)
+
+      // Assert
+      expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
+    })
+  })
 })
