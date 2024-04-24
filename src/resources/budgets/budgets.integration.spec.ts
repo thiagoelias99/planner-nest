@@ -416,6 +416,40 @@ describe('BudgetsIntegration', () => {
       expect(revertedBudgetSummary.incomes[0].isChecked).toBe(originalBudgetSummary.incomes[0].isChecked)
     })
 
+    it('should update deleted field of register', async () => {
+      const registerId = originalBudgetSummary.incomes[0].id
+
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ deleted: true })
+        .expect(200)
+
+      const updatedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(updatedBudgetSummary.incomes[0].value).toBe(originalBudgetSummary.incomes[0].value)
+      expect(updatedBudgetSummary.incomes[0].date).toBe(originalBudgetSummary.incomes[0].date)
+      expect(updatedBudgetSummary.incomes[0].isChecked).toBe(originalBudgetSummary.incomes[0].isChecked)
+      expect(updatedBudgetSummary.incomes[0].deleted).toBe(true)
+
+      //Revert changes
+      await request(app.getHttpServer())
+        .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ deleted: originalBudgetSummary.incomes[0].deleted })
+        .expect(200)
+
+      const revertedBudgetSummary = await request(app.getHttpServer())
+        .get('/budgets/summary/2024/4')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .then(response => response.body)
+
+      expect(revertedBudgetSummary.incomes[0].deleted).toBe(originalBudgetSummary.incomes[0].deleted)
+    })
+
     it('should update value of a checked register', async () => {
       const registerId = originalBudgetSummary.incomes[0].id
       const newValue = 999.99
@@ -470,11 +504,12 @@ describe('BudgetsIntegration', () => {
       const newValue = 2000
       const newDate = new Date('2024-05-18')
       const newChecked = true
+      const newDeleted = true
 
       await request(app.getHttpServer())
         .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ value: newValue, date: newDate.toISOString(), checked: newChecked })
+        .send({ value: newValue, date: newDate.toISOString(), checked: newChecked, deleted: newDeleted })
         .expect(200)
 
       const updatedBudgetSummary = await request(app.getHttpServer())
@@ -485,12 +520,13 @@ describe('BudgetsIntegration', () => {
       expect(updatedBudgetSummary.incomes[0].value).toBe(newValue)
       expect(updatedBudgetSummary.incomes[0].date).toBe(newDate.toISOString())
       expect(updatedBudgetSummary.incomes[0].isChecked).toBe(newChecked)
+      expect(updatedBudgetSummary.incomes[0].deleted).toBe(newDeleted)
 
       //Revert changes
       await request(app.getHttpServer())
         .patch(`/budgets/${originalBudgetSummary.incomes[0].parentId}/register/${registerId}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ value: originalBudgetSummary.incomes[0].value, date: originalBudgetSummary.incomes[0].date, checked: originalBudgetSummary.incomes[0].isChecked })
+        .send({ value: originalBudgetSummary.incomes[0].value, date: originalBudgetSummary.incomes[0].date, checked: originalBudgetSummary.incomes[0].isChecked, deleted: originalBudgetSummary.incomes[0].deleted })
         .expect(200)
 
       const revertedBudgetSummary = await request(app.getHttpServer())
@@ -501,6 +537,7 @@ describe('BudgetsIntegration', () => {
       expect(revertedBudgetSummary.incomes[0].value).toBe(originalBudgetSummary.incomes[0].value)
       expect(revertedBudgetSummary.incomes[0].date).toBe(originalBudgetSummary.incomes[0].date)
       expect(revertedBudgetSummary.incomes[0].isChecked).toBe(originalBudgetSummary.incomes[0].isChecked)
+      expect(revertedBudgetSummary.incomes[0].deleted).toBe(originalBudgetSummary.incomes[0].deleted)
     })
   })
 })

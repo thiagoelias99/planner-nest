@@ -23,5 +23,5 @@ export class UpdateBudgetRegisterDto {
   @IsBoolean()
   @IsOptional()
   @ApiProperty({ required: false })
-  delete?: boolean
+  deleted?: boolean
 }

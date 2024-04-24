@@ -18,7 +18,8 @@ export interface BudgetCreateDto extends CreateBudgetDto {
         id: string,
         value: number,
         date?: Date,
-        checked: boolean
+        checked: boolean,
+        deleted: boolean
       }
     ]
   }

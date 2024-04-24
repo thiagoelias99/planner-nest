@@ -27,7 +27,8 @@ export const budgetSchema = new Schema<IMongoBudgetSchema>(
           id: { type: String, required: true },
           value: { type: Number, required: true },
           date: { type: Date, required: false },
-          checked: { type: Boolean, required: true }
+          checked: { type: Boolean, required: true },
+          deleted: { type: Boolean, required: true}
         }
       ]
     }

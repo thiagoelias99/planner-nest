@@ -70,7 +70,8 @@ export class BudgetsService {
             id: randomUUID(),
             value: data.value,
             date: data.startDate || new Date(),
-            checked: consolidated
+            checked: consolidated,
+            deleted: false
           }
         ]
       }
@@ -152,12 +153,13 @@ export class BudgetsService {
     const summary: BudgetSummary = {
       incomes,
       outcomes,
-      predictedIncomeValue: incomes.reduce((acc, curr) => acc + curr.value, 0),
-      predictedOutcomeValue: outcomes.reduce((acc, curr) => acc + curr.value, 0),
-      predictedBalance: incomes.reduce((acc, curr) => acc + curr.value, 0) - outcomes.reduce((acc, curr) => acc + curr.value, 0),
-      actualIncomeValue: incomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0),
-      actualOutcomeValue: outcomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0),
-      actualBalance: incomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0) - outcomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0)
+      predictedIncomeValue: incomes.reduce((acc, curr) => acc + (curr.deleted ? 0 : curr.value), 0),
+      predictedOutcomeValue: outcomes.reduce((acc, curr) => acc + (curr.deleted ? 0 : curr.value), 0),
+      predictedBalance: incomes.reduce((acc, curr) => acc + (curr.deleted ? 0 : curr.value), 0) - outcomes.reduce((acc, curr) => acc + (curr.deleted ? 0 : curr.value), 0),
+      // actualIncomeValue: incomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0),
+      actualIncomeValue: incomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0),
+      actualOutcomeValue: outcomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0),
+      actualBalance: incomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0) - outcomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
     }
 
     return summary
@@ -182,7 +184,8 @@ export class BudgetsService {
         value: budgetFromThisMonth.value,
         date: budgetFromThisMonth.date,
         isChecked: budgetFromThisMonth.consolidated,
-        paymentMethod: budget.paymentMethod
+        paymentMethod: budget.paymentMethod,
+        deleted: budgetFromThisMonth.deleted
       }
 
       return simplified

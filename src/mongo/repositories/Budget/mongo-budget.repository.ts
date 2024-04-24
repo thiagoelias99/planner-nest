@@ -31,7 +31,8 @@ export class MongoBudgetsRepository extends BudgetsRepository {
             id: register.id,
             value: register.value,
             date: register.date,
-            consolidated: register.checked
+            consolidated: register.checked,
+            deleted: register.deleted
           }))
         }
       })
@@ -58,7 +59,8 @@ export class MongoBudgetsRepository extends BudgetsRepository {
             id: register.id,
             value: register.value,
             date: register.date,
-            consolidated: register.checked
+            consolidated: register.checked,
+            deleted: register.deleted || false
           }))
         }
       }))
@@ -93,7 +95,8 @@ export class MongoBudgetsRepository extends BudgetsRepository {
               id: registerId,
               value,
               date,
-              checked: false
+              checked: false,
+              deleted: false
             }
           }
         }
@@ -107,8 +110,6 @@ export class MongoBudgetsRepository extends BudgetsRepository {
   }
 
   async updateBudgetRegister(userId: string, budgetId: string, registerId: string, data: UpdateBudgetRegisterDto): Promise<any> {
-    console.log(data)
-
     try {
       //Verify if user has permission to update the register
       const budget = await this.budgetModel.findOne({ _id: budgetId, userId }).lean()
@@ -122,7 +123,8 @@ export class MongoBudgetsRepository extends BudgetsRepository {
           $set: {
             'recurrenceHistory.registers.$.value': data.value,
             'recurrenceHistory.registers.$.date': data.date,
-            'recurrenceHistory.registers.$.checked': data.checked
+            'recurrenceHistory.registers.$.checked': data.checked,
+            'recurrenceHistory.registers.$.deleted': data.deleted
           }
         }
       )

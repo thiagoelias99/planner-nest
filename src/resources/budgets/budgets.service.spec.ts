@@ -3,7 +3,6 @@ import { BudgetsService } from './budgets.service'
 import { BudgetsRepository } from './budgets.repository'
 import { BudgetPaymentMethodEnum } from './budgets.entity'
 
-
 describe('BudgetsService', () => {
   let budgetsService: BudgetsService
   let budgetsRepository: BudgetsRepository
@@ -59,6 +58,7 @@ describe('BudgetsService', () => {
             value: data.value,
             date: expect.any(Date),
             checked: true,
+            deleted: false
           },
         ],
       },
@@ -96,6 +96,7 @@ describe('BudgetsService', () => {
             value: data.value,
             date: expect.any(Date),
             checked: true,
+            deleted: false
           },
         ],
       },
@@ -133,6 +134,7 @@ describe('BudgetsService', () => {
             value: data.value,
             date: expect.any(Date),
             checked: true,
+            deleted: false
           },
         ],
       },
@@ -170,6 +172,7 @@ describe('BudgetsService', () => {
             value: data.value,
             date: expect.any(Date),
             checked: true,
+            deleted: false
           },
         ],
       },
@@ -207,6 +210,7 @@ describe('BudgetsService', () => {
             value: data.value,
             date: expect.any(Date),
             checked: data.consolidated,
+            deleted: false
           },
         ],
       },
@@ -244,6 +248,7 @@ describe('BudgetsService', () => {
             value: data.value,
             date: expect.any(Date),
             checked: true,
+            deleted: false
           },
         ],
       },
@@ -282,6 +287,7 @@ describe('BudgetsService', () => {
             value: data.value,
             date: startDate,
             checked: true,
+            deleted: false
           },
         ],
       },
@@ -322,6 +328,7 @@ describe('BudgetsService', () => {
             value: data.value,
             date: startDate,
             checked: true,
+            deleted: false
           },
         ],
       },
@@ -367,6 +374,7 @@ describe('BudgetsService', () => {
             value: data.value,
             date: startDate,
             checked: data.consolidated,
+            deleted: false
           },
         ],
       },
@@ -405,6 +413,7 @@ describe('BudgetsService', () => {
             value: data.value,
             date: startDate,
             checked: true,
+            deleted: false,
           },
         ],
       },

@@ -25,13 +25,15 @@ export class Register {
   @ApiProperty({ example: 19.99 }) value: number
   @ApiProperty({ example: new Date().toISOString() }) date: Date
   @ApiProperty({ example: true }) consolidated: boolean
+  @ApiProperty() deleted: boolean
 
   public static mock(): Register {
     const data = {
       id: '21f58a70-3d62-4524-b564-3464d85e9e0d',
       value: 19.99,
       date: new Date('2024-02-15T00:00:00.000Z'),
-      consolidated: true
+      consolidated: true,
+      deleted: false
     }
     return data as Register
   }
@@ -83,4 +85,5 @@ export class BudgetSimplified{
   @ApiProperty({ example: new Date().toISOString() }) date: Date
   @ApiProperty() isChecked: boolean
   @ApiProperty({ enum: BudgetPaymentMethodEnum}) paymentMethod: BudgetPaymentMethodEnum
+  @ApiProperty() deleted: boolean
 }
