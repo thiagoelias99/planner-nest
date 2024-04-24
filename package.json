@@ -20,7 +20,7 @@
     "test:debug": "dotenv -e .env.test -- node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "dotenv -e .env.test -- npx prisma migrate reset --force & jest --config ./test/jest-e2e.json",
     "test:file": "dotenv -e .env.test -- prisma migrate reset --force & jest case2.spec",
-    "test:file:watch": "dotenv -e .env.test -- prisma migrate reset --force & jest budgets.integration.spec --watch",
+    "test:file:watch": "dotenv -e .env.test -- prisma migrate reset --force & jest case3.spec --watch",
     "migrate": "dotenv -e .env.development -- npx prisma migrate dev",
     "migrate:deploy": "npx prisma migrate deploy",
     "db:push": "dotenv -e .env.development -- npx prisma db push",
