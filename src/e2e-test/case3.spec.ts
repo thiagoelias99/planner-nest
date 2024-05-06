@@ -25,7 +25,7 @@ import * as moment from 'moment'
 
 import { AppModule } from '../app.module'
 import { CreateUserDto } from '../resources/users/dto/create-user.dto'
-import { BudgetSimplified } from 'src/resources/budgets/budgets.entity'
+import { BudgetPaymentMethodEnum, BudgetSimplified } from '../resources/budgets/budgets.entity'
 
 const userLoginData = CreateUserDto.mock()
 let accessToken: string
@@ -54,12 +54,23 @@ const budgetsData = [
     description: 'one-time expense',
     isIncome: false,
     consolidated: false
-  },  
+  },
+  //Credit must be ignored in summary
+  {
+    value: 222,
+    description: 'credit income',
+    paymentMethod: BudgetPaymentMethodEnum.CREDIT
+  },
+  {
+    value: 111,
+    description: 'credit expense',
+    isIncome: false,
+    paymentMethod: BudgetPaymentMethodEnum.CREDIT}
 ]
 
 let recurrentlyIncome: BudgetSimplified = null
-let recurrentlyExpense: BudgetSimplified = null
-let oneTimeIncome: BudgetSimplified = null
+// let recurrentlyExpense: BudgetSimplified = null
+// let oneTimeIncome: BudgetSimplified = null
 let oneTimeExpense: BudgetSimplified = null
 
 describe('Case 3 - E2E', () => {
@@ -127,8 +138,8 @@ describe('Case 3 - E2E', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)
     // Assert
-    expect(response.body.incomes).toHaveLength(2)
-    expect(response.body.outcomes).toHaveLength(2)
+    expect(response.body.incomes).toHaveLength(3)
+    expect(response.body.outcomes).toHaveLength(3)
     expect(response.body.predictedIncomeValue).toBe(2500)
     expect(response.body.predictedOutcomeValue).toBe(1250)
     expect(response.body.predictedBalance).toBe(1250)
@@ -137,8 +148,8 @@ describe('Case 3 - E2E', () => {
     expect(response.body.actualBalance).toBe(0)
 
     recurrentlyIncome = response.body.incomes.find(b => b.description === 'recurrently income')
-    recurrentlyExpense = response.body.outcomes.find(b => b.description === 'recurrently expense')
-    oneTimeIncome = response.body.incomes.find(b => b.description === 'one-time income')
+    // recurrentlyExpense = response.body.outcomes.find(b => b.description === 'recurrently expense')
+    // oneTimeIncome = response.body.incomes.find(b => b.description === 'one-time income')
     oneTimeExpense = response.body.outcomes.find(b => b.description === 'one-time expense')
   })
 
@@ -167,8 +178,8 @@ describe('Case 3 - E2E', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)
     // Assert
-    expect(response.body.incomes).toHaveLength(2)
-    expect(response.body.outcomes).toHaveLength(2)
+    expect(response.body.incomes).toHaveLength(3)
+    expect(response.body.outcomes).toHaveLength(3)
     expect(response.body.predictedIncomeValue).toBe(2500)
     expect(response.body.predictedOutcomeValue).toBe(1250)
     expect(response.body.predictedBalance).toBe(1250)
@@ -193,8 +204,8 @@ describe('Case 3 - E2E', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)
     // Assert
-    expect(response.body.incomes).toHaveLength(2)
-    expect(response.body.outcomes).toHaveLength(2)
+    expect(response.body.incomes).toHaveLength(3)
+    expect(response.body.outcomes).toHaveLength(3)
     expect(response.body.predictedIncomeValue).toBe(2500)
     expect(response.body.predictedOutcomeValue).toBe(1250)
     expect(response.body.predictedBalance).toBe(1250)
@@ -219,8 +230,8 @@ describe('Case 3 - E2E', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)
     // Assert
-    expect(response.body.incomes).toHaveLength(2)
-    expect(response.body.outcomes).toHaveLength(2)
+    expect(response.body.incomes).toHaveLength(3)
+    expect(response.body.outcomes).toHaveLength(3)
     expect(response.body.predictedIncomeValue).toBe(2500)
     expect(response.body.predictedOutcomeValue).toBe(1000)
     expect(response.body.predictedBalance).toBe(1500)

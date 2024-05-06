@@ -150,16 +150,17 @@ export class BudgetsService {
     const outcomes = this.filterBudgets(budgets, month, year, false)
 
     //Calculate summary
+    //Budget Marked as credit should not be considered in the summary predicted and actual values
     const summary: BudgetSummary = {
       incomes,
       outcomes,
-      predictedIncomeValue: incomes.reduce((acc, curr) => acc + (curr.deleted ? 0 : curr.value), 0),
-      predictedOutcomeValue: outcomes.reduce((acc, curr) => acc + (curr.deleted ? 0 : curr.value), 0),
-      predictedBalance: incomes.reduce((acc, curr) => acc + (curr.deleted ? 0 : curr.value), 0) - outcomes.reduce((acc, curr) => acc + (curr.deleted ? 0 : curr.value), 0),
+      predictedIncomeValue: incomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0),
+      predictedOutcomeValue: outcomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0),
+      predictedBalance: incomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0) - outcomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0),
       // actualIncomeValue: incomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0),
-      actualIncomeValue: incomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0),
-      actualOutcomeValue: outcomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0),
-      actualBalance: incomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0) - outcomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
+      actualIncomeValue: incomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT ? curr.value : 0), 0),
+      actualOutcomeValue: outcomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT  ? curr.value : 0), 0),
+      actualBalance: incomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT  ? curr.value : 0), 0) - outcomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT  ? curr.value : 0), 0)
     }
 
     return summary
