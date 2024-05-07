@@ -1,11 +1,11 @@
 /* eslint-disable indent */
 import { ApiProperty } from '@nestjs/swagger'
 import { BudgetPaymentMethodEnum } from '../budgets.entity'
-import { IsBoolean, IsDateString, IsEnum, IsInt, IsNumber, IsOptional, IsPositive, IsString, Length, Max, Min } from 'class-validator'
+import { IsBoolean, IsDateString, IsEnum, IsInt, IsNumber, IsOptional, IsString, Length, Max, Min } from 'class-validator'
 
 export class CreateBudgetDto {
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   @ApiProperty({ example: 1999.99, required: true })
   value: number
 

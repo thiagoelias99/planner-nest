@@ -1,11 +1,11 @@
 /* eslint-disable indent */
 
 import { ApiProperty } from '@nestjs/swagger'
-import { IsBoolean, IsDateString, IsNumber, IsOptional, IsPositive } from 'class-validator'
+import { IsBoolean, IsDateString, IsNumber, IsOptional, Min } from 'class-validator'
 
 export class UpdateBudgetRegisterDto {
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   @IsOptional()
   @ApiProperty({ required: false })
   value?: number

@@ -115,7 +115,7 @@ describe('BudgetsController', () => {
       // Assert
       expect(response.body).toHaveProperty('error')
       expect(response.body).toHaveProperty('message')
-      expect(response.body.message).toContain('value must be a positive number')
+      expect(response.body.message).toContain('value must be a number conforming to the specified constraints')
     })
 
     it('should return error message if value is not a number', async () => {
