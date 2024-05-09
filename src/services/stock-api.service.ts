@@ -28,6 +28,8 @@ export class StockApiService {
     const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}.SAO&apikey=${apiKey}`
     const { data } = await axios.get<AlphaAPIResponse>(url)
 
+    console.log(data)
+
     return data['Global Quote']
   }
 }
