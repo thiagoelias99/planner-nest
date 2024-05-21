@@ -6,7 +6,7 @@ import * as moment from 'moment'
 
 import { AppModule } from '../../app.module'
 import { CreateBudgetDto } from './dto/create-budget.dto'
-import { BudgetPaymentMethodEnum } from './budgets.entity'
+import { BudgetClassEnum, BudgetPaymentMethodEnum } from './budgets.entity'
 import { CreateUserDto } from '../users/dto/create-user.dto'
 import { BudgetsService } from './budgets.service'
 import { BudgetSummary } from './dto/summary.dto'
@@ -68,6 +68,7 @@ describe('BudgetsIntegration', () => {
     it('should create a budget with only value', async () => {
       const createData: CreateBudgetDto = {
         value: 1000.99,
+        budgetClass: BudgetClassEnum.INCOME
       }
 
       const response = await request(app.getHttpServer())
@@ -99,7 +100,7 @@ describe('BudgetsIntegration', () => {
         startDate: new Date('2021-01-01'),
         endDate: new Date(),
         paymentMethod: BudgetPaymentMethodEnum.PIX,
-        isIncome: false,
+        budgetClass: BudgetClassEnum.INCOME,
       }
 
       const response = await request(app.getHttpServer())
@@ -112,7 +113,7 @@ describe('BudgetsIntegration', () => {
       expect(response.body.currentValue).toBe(createData.value)
       expect(response.body.description).toBe(createData.description)
       expect(response.body.isRecurrent).toBeTruthy()
-      expect(response.body.isIncome).toBe(createData.isIncome)
+      expect(response.body.budgetClass).toBe(createData.budgetClass)
       expect(response.body.paymentMethod).toBe(createData.paymentMethod)
 
       expect(response.body).toHaveProperty('recurrenceHistory')
@@ -138,26 +139,30 @@ describe('BudgetsIntegration', () => {
     const budgetCreate1: CreateBudgetDto = {
       value: 1000,
       description: 'Budget 1 - Unique',
+      budgetClass: BudgetClassEnum.INCOME
     }
 
     const budgetCreate2: CreateBudgetDto = {
       value: 2000,
       description: 'Budget 2 - Recurrent Start & End',
       startDate: moment().subtract(1, 'year').toDate(),
-      endDate: moment().add(1, 'year').toDate()
+      endDate: moment().add(1, 'year').toDate(),
+      budgetClass: BudgetClassEnum.INCOME
     }
 
     const budgetCreate3: CreateBudgetDto = {
       value: 3000,
       description: 'Budget 3 - Recurrent Start only',
       startDate: moment().subtract(6, 'month').toDate(),
+      budgetClass: BudgetClassEnum.INCOME
     }
 
     const budgetCreate4: CreateBudgetDto = {
       value: 4000,
       description: 'Budget 4 - Recurrent Outdated',
       startDate: moment().subtract(6, 'month').toDate(),
-      endDate: moment().subtract(4, 'month').toDate()
+      endDate: moment().subtract(4, 'month').toDate(),
+      budgetClass: BudgetClassEnum.INCOME
     }
 
     beforeAll(async () => {
@@ -288,6 +293,7 @@ describe('BudgetsIntegration', () => {
       value: 1000,
       description: 'Patch Budget 1',
       startDate: new Date('2024-05-09'),
+      budgetClass: BudgetClassEnum.INCOME
       // endDate: new Date('2024-05-09'),
     }
 

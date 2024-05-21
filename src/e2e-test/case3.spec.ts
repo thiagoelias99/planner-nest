@@ -25,7 +25,7 @@ import * as moment from 'moment'
 
 import { AppModule } from '../app.module'
 import { CreateUserDto } from '../resources/users/dto/create-user.dto'
-import { BudgetPaymentMethodEnum, BudgetSimplified } from '../resources/budgets/budgets.entity'
+import { BudgetClassEnum, BudgetPaymentMethodEnum, BudgetSimplified } from '../resources/budgets/budgets.entity'
 
 const userLoginData = CreateUserDto.mock()
 let accessToken: string
@@ -35,37 +35,40 @@ const budgetsData = [
     value: 2000,
     description: 'recurrently income',
     startDate: moment().subtract(6, 'month').toDate(),
-    consolidated: false
+    consolidated: false,
+    budgetClass: BudgetClassEnum.INCOME
   },
   {
     value: 1000,
     description: 'recurrently expense',
     startDate: moment().subtract(6, 'month').toDate(),
-    isIncome: false,
-    consolidated: false
+    consolidated: false,
+    budgetClass: BudgetClassEnum.EXPENSE
   },
   {
     value: 500,
     description: 'one-time income',
-    consolidated: false
+    consolidated: false,
+    budgetClass: BudgetClassEnum.INCOME
   },
   {
     value: 250,
     description: 'one-time expense',
-    isIncome: false,
-    consolidated: false
+    consolidated: false,
+    budgetClass: BudgetClassEnum.EXPENSE
   },
   //Credit must be ignored in summary
   {
     value: 222,
     description: 'credit income',
-    paymentMethod: BudgetPaymentMethodEnum.CREDIT
+    paymentMethod: BudgetPaymentMethodEnum.CREDIT,
+    budgetClass: BudgetClassEnum.INCOME
   },
   {
     value: 111,
     description: 'credit expense',
-    isIncome: false,
-    paymentMethod: BudgetPaymentMethodEnum.CREDIT}
+    budgetClass: BudgetClassEnum.EXPENSE,
+    paymentMethod: BudgetPaymentMethodEnum.CREDIT},
 ]
 
 let recurrentlyIncome: BudgetSimplified = null

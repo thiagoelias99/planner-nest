@@ -1,11 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Exclude } from 'class-transformer'
 
+// TODO: Remove comments
+
 export enum BudgetPaymentMethodEnum {
   CREDIT = 'CREDIT',
   DEBIT = 'DEBIT',
   PIX = 'PIX',
   TRANSFER = 'TRANSFER'
+}
+
+export enum BudgetClassEnum {
+  INCOME = 'income',
+  EXPENSE = 'expense',
+  CREDIT_CARD = 'creditCard',
+  PENSION = 'pension',
+  INVESTMENT = 'investment',
+  CASH_BOX = 'cashBox'
 }
 
 export class ActiveHistory {
@@ -48,7 +59,8 @@ export class RecurrenceHistory {
 export class Budget {
   @ApiProperty({ example: '21f58a70-3d62-4524-b564-3464d85e9e0d' }) id: string
   @Exclude() userId: string
-  @ApiProperty({ example: false }) isIncome: boolean
+  // @ApiProperty({ example: false }) isIncome: boolean
+  @ApiProperty({ example: BudgetClassEnum.INCOME, enum: BudgetClassEnum, required: true }) budgetClass: BudgetClassEnum
   @ApiProperty({ example: 'Salary' }) description: string
   @ApiProperty({ example: 1000 }) currentValue: number
   @ApiProperty({ example: 1 }) expectedDay: number
@@ -63,7 +75,8 @@ export class Budget {
   public static mock(): Budget {
     const data = {
       id: '21f58a70-3d62-4524-b564-3464d85e9e0d',
-      isIncome: false,
+      // isIncome: false,
+      budgetClass: BudgetClassEnum.INCOME,
       description: 'Salary',
       currentValue: 1000,
       expectedDay: 1,

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { BudgetsService } from './budgets.service'
 import { BudgetsRepository } from './budgets.repository'
-import { BudgetPaymentMethodEnum } from './budgets.entity'
+import { BudgetClassEnum, BudgetPaymentMethodEnum } from './budgets.entity'
 
 describe('BudgetsService', () => {
   let budgetsService: BudgetsService
@@ -30,7 +30,8 @@ describe('BudgetsService', () => {
 
   it('should set default values if not provided', async () => {
     const data = {
-      value: 1999.99
+      value: 1999.99,
+      budgetClass: BudgetClassEnum.INCOME
     }
 
     await budgetsService.create('userId', data)
@@ -41,7 +42,7 @@ describe('BudgetsService', () => {
       isRecurrent: false,
       description: 'Extra',
       expectedDay: new Date().getDate(),
-      isIncome: true,
+      budgetClass: BudgetClassEnum.INCOME,
       paymentMethod: BudgetPaymentMethodEnum.DEBIT,
       value: data.value,
       consolidated: true,
@@ -69,6 +70,7 @@ describe('BudgetsService', () => {
     const data = {
       value: 1999.99,
       expectedDay: 10,
+      budgetClass: BudgetClassEnum.INCOME
     }
 
     await budgetsService.create('userId', data)
@@ -79,7 +81,7 @@ describe('BudgetsService', () => {
       isRecurrent: false,
       description: 'Extra',
       expectedDay: data.expectedDay,
-      isIncome: true,
+      budgetClass: BudgetClassEnum.INCOME,
       paymentMethod: BudgetPaymentMethodEnum.DEBIT,
       value: data.value,
       consolidated: true,
@@ -107,6 +109,7 @@ describe('BudgetsService', () => {
     const data = {
       value: 1999.99,
       description: 'Salary',
+      budgetClass: BudgetClassEnum.INCOME
     }
 
     await budgetsService.create('userId', data)
@@ -117,7 +120,7 @@ describe('BudgetsService', () => {
       isRecurrent: false,
       description: data.description,
       expectedDay: new Date().getDate(),
-      isIncome: true,
+      budgetClass: BudgetClassEnum.INCOME,
       paymentMethod: BudgetPaymentMethodEnum.DEBIT,
       value: data.value,
       consolidated: true,
@@ -141,10 +144,10 @@ describe('BudgetsService', () => {
     })
   })
 
-  it('should set use isIncome value if passed', async () => {
+  it('should set use budgetClass value if passed', async () => {
     const data = {
       value: 1999.99,
-      isIncome: false,
+      budgetClass: BudgetClassEnum.CREDIT_CARD,
     }
 
     await budgetsService.create('userId', data)
@@ -155,7 +158,7 @@ describe('BudgetsService', () => {
       isRecurrent: false,
       description: 'Extra',
       expectedDay: new Date().getDate(),
-      isIncome: data.isIncome,
+      budgetClass: BudgetClassEnum.CREDIT_CARD,
       paymentMethod: BudgetPaymentMethodEnum.DEBIT,
       value: data.value,
       consolidated: true,
@@ -183,6 +186,7 @@ describe('BudgetsService', () => {
     const data = {
       value: 1999.99,
       consolidated: false,
+      budgetClass: BudgetClassEnum.CREDIT_CARD
     }
 
     await budgetsService.create('userId', data)
@@ -193,7 +197,7 @@ describe('BudgetsService', () => {
       isRecurrent: false,
       description: 'Extra',
       expectedDay: new Date().getDate(),
-      isIncome: true,
+      budgetClass: BudgetClassEnum.CREDIT_CARD,
       paymentMethod: BudgetPaymentMethodEnum.DEBIT,
       value: data.value,
       consolidated: data.consolidated,
@@ -221,6 +225,7 @@ describe('BudgetsService', () => {
     const data = {
       value: 1999.99,
       paymentMethod: BudgetPaymentMethodEnum.CREDIT,
+      budgetClass: BudgetClassEnum.CASH_BOX
     }
 
     await budgetsService.create('userId', data)
@@ -231,7 +236,7 @@ describe('BudgetsService', () => {
       isRecurrent: false,
       description: 'Extra',
       expectedDay: new Date().getDate(),
-      isIncome: true,
+      budgetClass: BudgetClassEnum.CASH_BOX,
       paymentMethod: BudgetPaymentMethodEnum.CREDIT,
       value: data.value,
       consolidated: true,
@@ -260,6 +265,7 @@ describe('BudgetsService', () => {
     const data = {
       value: 1999.99,
       startDate,
+      budgetClass: BudgetClassEnum.CASH_BOX
     }
 
     await budgetsService.create('userId', data)
@@ -270,7 +276,7 @@ describe('BudgetsService', () => {
       isRecurrent: true,
       description: 'Extra',
       expectedDay: startDate.getDate(),
-      isIncome: true,
+      budgetClass: BudgetClassEnum.CASH_BOX,
       paymentMethod: BudgetPaymentMethodEnum.DEBIT,
       value: data.value,
       consolidated: true,
@@ -301,6 +307,7 @@ describe('BudgetsService', () => {
       value: 1999.99,
       startDate,
       endDate,
+      budgetClass: BudgetClassEnum.INVESTMENT
     }
 
     await budgetsService.create('userId', data)
@@ -311,7 +318,7 @@ describe('BudgetsService', () => {
       isRecurrent: true,
       description: 'Extra',
       expectedDay: startDate.getDate(),
-      isIncome: true,
+      budgetClass: BudgetClassEnum.INVESTMENT,
       paymentMethod: BudgetPaymentMethodEnum.DEBIT,
       value: data.value,
       consolidated: true,
@@ -340,7 +347,7 @@ describe('BudgetsService', () => {
     const endDate = new Date('2021-12-31')
     const data = {
       value: 1999.99,
-      isIncome: false,
+      budgetClass: BudgetClassEnum.INVESTMENT,
       description: 'Salary',
       expectedDay: 10,
       consolidated: false,
@@ -357,7 +364,7 @@ describe('BudgetsService', () => {
       isRecurrent: true,
       description: data.description,
       expectedDay: data.expectedDay,
-      isIncome: data.isIncome,
+      budgetClass: data.budgetClass,
       paymentMethod: data.paymentMethod,
       value: data.value,
       consolidated: data.consolidated,
@@ -386,6 +393,7 @@ describe('BudgetsService', () => {
     const data = {
       value: 1999.99,
       startDate,
+      budgetClass: BudgetClassEnum.PENSION
     }
 
     await budgetsService.create('userId', data)
@@ -396,7 +404,7 @@ describe('BudgetsService', () => {
       isRecurrent: true,
       description: 'Extra',
       expectedDay: startDate.getDate(),
-      isIncome: true,
+      budgetClass: BudgetClassEnum.PENSION,
       paymentMethod: BudgetPaymentMethodEnum.DEBIT,
       value: data.value,
       consolidated: true,

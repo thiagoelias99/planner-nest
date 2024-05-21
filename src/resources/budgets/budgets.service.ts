@@ -3,10 +3,12 @@ import * as moment from 'moment'
 import { BudgetsRepository } from './budgets.repository'
 import { CreateBudgetDto } from './dto/create-budget.dto'
 import { randomUUID } from 'crypto'
-import { Budget, BudgetPaymentMethodEnum, BudgetSimplified } from './budgets.entity'
+import { Budget, BudgetClassEnum, BudgetPaymentMethodEnum, BudgetSimplified } from './budgets.entity'
 import { GetBudgetQueryDto } from './dto/get-budget-query.dto'
 import { BudgetSummary } from './dto/summary.dto'
 import { UpdateBudgetRegisterDto } from './dto/update-register.dto'
+
+// TODO: Remove comments
 
 @Injectable()
 export class BudgetsService {
@@ -15,17 +17,16 @@ export class BudgetsService {
   ) { }
 
   async create(userId: string, data: CreateBudgetDto) {
-    let isIncome: boolean = true
     let consolidated: boolean = true
     let startDate: Date | undefined
     let expectedDay: number
 
     // Normalize isIncome
-    if (data.isIncome === undefined) {
-      isIncome = true
-    } else {
-      isIncome = data.isIncome
-    }
+    // if (data.isIncome === undefined) {
+    //   isIncome = true
+    // } else {
+    //   isIncome = data.isIncome
+    // }
 
     // Normalize consolidated
     if (data.consolidated === undefined) {
@@ -54,7 +55,7 @@ export class BudgetsService {
       isRecurrent: !!data.startDate,
       description: data.description || 'Extra',
       expectedDay: expectedDay,
-      isIncome,
+      budgetClass: data.budgetClass,
       paymentMethod: data.paymentMethod || BudgetPaymentMethodEnum.DEBIT,
       value: data.value,
       consolidated: consolidated,
@@ -146,8 +147,8 @@ export class BudgetsService {
       year: year.toString()
     })
 
-    const incomes = this.filterBudgets(budgets, month, year, true)
-    const outcomes = this.filterBudgets(budgets, month, year, false)
+    const incomes = this.filterBudgets(budgets, month, year, BudgetClassEnum.INCOME)
+    const outcomes = this.filterBudgets(budgets, month, year, BudgetClassEnum.EXPENSE)
 
     //Calculate summary
     //Budget Marked as credit should not be considered in the summary predicted and actual values
@@ -170,8 +171,9 @@ export class BudgetsService {
     return this.budgetsRepository.addRegister(budgetId, value, date)
   }
 
-  filterBudgets(budgets: Budget[], month: number, year: number, income: boolean) {
-    const incomeBudgets = budgets.filter(budget => budget.isIncome === income)
+  // filterBudgets(budgets: Budget[], month: number, year: number, income: boolean) {
+  filterBudgets(budgets: Budget[], month: number, year: number, budgetClass: BudgetClassEnum) {
+    const incomeBudgets = budgets.filter(budget => budget.budgetClass === budgetClass)
     //Select register from selected date
     return incomeBudgets.map(budget => {
       const budgetFromThisMonth = budget.recurrenceHistory.registers.find(register => {
