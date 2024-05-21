@@ -6,6 +6,10 @@
  * - Create a recurrently expense budget
  * - Create a one-time income budget
  * - Create a one-time expense budget
+ * - Create 2 credits card budget
+ * - Create a pension budget
+ * - Create an investment budget
+ * - Create 3 cash box budget
  * - Get budgets summary from current month
  * - Check a budget (recurrently income budget)
  * - Check a budget (one-time expense budget)
@@ -68,7 +72,44 @@ const budgetsData = [
     value: 111,
     description: 'credit expense',
     budgetClass: BudgetClassEnum.EXPENSE,
-    paymentMethod: BudgetPaymentMethodEnum.CREDIT},
+    paymentMethod: BudgetPaymentMethodEnum.CREDIT
+  },
+  {
+    value: 333,
+    description: 'credit card 1',
+    budgetClass: BudgetClassEnum.CREDIT_CARD
+  },
+  {
+    value: 335,
+    description: 'credit card 2',
+    budgetClass: BudgetClassEnum.CREDIT_CARD
+  },
+  {
+    value: 400,
+    description: 'pension',
+    budgetClass: BudgetClassEnum.PENSION
+  },
+  {
+    value: 500,
+    description: 'investment',
+    budgetClass: BudgetClassEnum.INVESTMENT
+  },
+  {
+    value: 100,
+    description: 'cash box 1',
+    budgetClass: BudgetClassEnum.CASH_BOX
+  },
+  {
+    value: 200,
+    description: 'cash box 2',
+    budgetClass: BudgetClassEnum.CASH_BOX
+  },
+  {
+    value: 300,
+    description: 'cash box 3',
+    budgetClass: BudgetClassEnum.CASH_BOX
+  
+  }
 ]
 
 let recurrentlyIncome: BudgetSimplified = null
@@ -121,7 +162,7 @@ describe('Case 3 - E2E', () => {
     accessToken = response.body.accessToken
   })
 
-  it('should create 4 Budgets', async () => {
+  it('should create Budgets', async () => {
     // Act
     const budgetsMap = budgetsData.map(budget => {
       return request(app.getHttpServer())
@@ -189,6 +230,26 @@ describe('Case 3 - E2E', () => {
     expect(response.body.actualIncomeValue).toBe(2000)
     expect(response.body.actualOutcomeValue).toBe(250)
     expect(response.body.actualBalance).toBe(1750)
+
+    // Credit cards check
+    expect(response.body.creditCards).toHaveLength(2)
+    expect(response.body.actualCreditValue).toBe(333 + 335)
+    expect(response.body.creditLimitValue).toBeDefined()
+
+    // Pension check
+    expect(response.body.pensions).toHaveLength(1)
+    expect(response.body.actualPensionValue).toBe(400)
+    expect(response.body.predictedPensionValue).toBeDefined()
+
+    // Investment check
+    expect(response.body.investments).toHaveLength(1)
+    expect(response.body.actualInvestmentsValue).toBe(500)
+    expect(response.body.predictedInvestmentsValue).toBeDefined()
+
+    // Cash box check
+    expect(response.body.cashBoxes).toHaveLength(3)
+    expect(response.body.actualCashBoxValue).toBe(600)
+    expect(response.body.predictedCashBoxValue).toBeDefined()
   })
 
   it('should uncheck a budget (one-time expense budget)', async () => {
