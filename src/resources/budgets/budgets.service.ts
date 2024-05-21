@@ -147,21 +147,65 @@ export class BudgetsService {
       year: year.toString()
     })
 
-    const incomes = this.filterBudgets(budgets, month, year, BudgetClassEnum.INCOME)
-    const outcomes = this.filterBudgets(budgets, month, year, BudgetClassEnum.EXPENSE)
-
     //Calculate summary
     //Budget Marked as credit should not be considered in the summary predicted and actual values
+
+    const incomes = this.filterBudgets(budgets, month, year, BudgetClassEnum.INCOME)
+    const outcomes = this.filterBudgets(budgets, month, year, BudgetClassEnum.EXPENSE)
+    const creditCards = this.filterBudgets(budgets, month, year, BudgetClassEnum.CREDIT_CARD)
+    const pensions = this.filterBudgets(budgets, month, year, BudgetClassEnum.PENSION)
+    const investments = this.filterBudgets(budgets, month, year, BudgetClassEnum.INVESTMENT)
+    const cashBoxes = this.filterBudgets(budgets, month, year, BudgetClassEnum.CASH_BOX)
+
+    // Income
+    const predictedIncomeValue = incomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0)
+    const actualIncomeValue = incomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT ? curr.value : 0), 0)
+
+    // Outcome
+    const actualOutcomeValue = outcomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT ? curr.value : 0), 0)
+    const predictedOutcomeValue = outcomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0)
+
+    // Balance
+    const predictedBalance = predictedIncomeValue - predictedOutcomeValue
+    const actualBalance = actualIncomeValue - actualOutcomeValue
+
+    // Credit
+    const actualCreditValue = creditCards.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
+    const creditLimitValue = calculateCreditLimit(actualIncomeValue, predictedOutcomeValue, 0.25)
+
+    // Pension
+    const actualPensionValue = pensions.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
+    const predictedPensionValue = calculateValueFromActualBalance(actualBalance, 0.08)
+
+    // Investments
+    const actualInvestmentsValue = investments.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
+    const predictedInvestmentsValue = calculateValueFromActualBalance(actualBalance, 0.65)
+
+    // Cash Box
+    const actualCashBoxValue = cashBoxes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
+    const predictedCashBoxValue = calculateValueFromActualBalance(actualBalance, 0.27)
+
     const summary: BudgetSummary = {
       incomes,
       outcomes,
-      predictedIncomeValue: incomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0),
-      predictedOutcomeValue: outcomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0),
-      predictedBalance: incomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0) - outcomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0),
-      // actualIncomeValue: incomes.reduce((acc, curr) => acc + (curr.isChecked ? curr.value : 0), 0),
-      actualIncomeValue: incomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT ? curr.value : 0), 0),
-      actualOutcomeValue: outcomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT  ? curr.value : 0), 0),
-      actualBalance: incomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT  ? curr.value : 0), 0) - outcomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT  ? curr.value : 0), 0)
+      creditCards,
+      pensions,
+      investments,
+      cashBoxes,
+      predictedIncomeValue,
+      predictedOutcomeValue,
+      predictedBalance,
+      actualIncomeValue,
+      actualOutcomeValue,
+      actualBalance,
+      actualCreditValue,
+      creditLimitValue,
+      actualPensionValue,
+      predictedPensionValue,
+      actualInvestmentsValue,
+      predictedInvestmentsValue,
+      actualCashBoxValue,
+      predictedCashBoxValue
     }
 
     return summary
@@ -195,7 +239,17 @@ export class BudgetsService {
     })
   }
 
-  async updateBudgetRegister(userId: string,budgetId: string, registerId: string, data: UpdateBudgetRegisterDto) {
+  async updateBudgetRegister(userId: string, budgetId: string, registerId: string, data: UpdateBudgetRegisterDto) {
     return this.budgetsRepository.updateBudgetRegister(userId, budgetId, registerId, data)
   }
+}
+
+function calculateCreditLimit(actualIncomeValue: number, predictedOutcomeValue: number, creditPercent: number) {
+  const maxExpenseLimit = actualIncomeValue * creditPercent
+  const creditLimit = maxExpenseLimit - predictedOutcomeValue
+  return creditLimit > 0 ? creditLimit : 0
+}
+
+function calculateValueFromActualBalance(actualBalance: number, percent: number) {
+  return actualBalance > 0 ? actualBalance * percent : 0
 }
