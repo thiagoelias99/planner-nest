@@ -165,13 +165,13 @@ export class BudgetsService {
     const actualOutcomeValue = outcomes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted && curr.paymentMethod !== BudgetPaymentMethodEnum.CREDIT ? curr.value : 0), 0)
     const predictedOutcomeValue = outcomes.reduce((acc, curr) => acc + (curr.deleted || (curr.paymentMethod === BudgetPaymentMethodEnum.CREDIT) ? 0 : curr.value), 0)
 
-    // Balance
-    const predictedBalance = predictedIncomeValue - predictedOutcomeValue
-    const actualBalance = actualIncomeValue - actualOutcomeValue
-
     // Credit
     const actualCreditValue = creditCards.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
     const creditLimitValue = calculateCreditLimit(actualIncomeValue, predictedOutcomeValue, 0.25)
+
+    // Balance
+    const predictedBalance = predictedIncomeValue - predictedOutcomeValue - creditLimitValue
+    const actualBalance = actualIncomeValue - actualOutcomeValue - actualCreditValue
 
     // Pension
     const actualPensionValue = pensions.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
