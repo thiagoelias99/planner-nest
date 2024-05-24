@@ -19,10 +19,11 @@ model User {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
-  Address     UserAddress    @relation(fields: [userAddressId], references: [id])
-  Preferences UserPreference @relation(fields: [userPreferenceId], references: [id])
-  ToDos       ToDo[]
-  StockOrders StockOrder[]
+  Address      UserAddress    @relation(fields: [userAddressId], references: [id])
+  Preferences  UserPreference @relation(fields: [userPreferenceId], references: [id])
+  ToDos        ToDo[]
+  StockOrders  StockOrder[]
+  StockHistory StockHistory[]
 
   @@map("users")
 }
@@ -87,7 +88,8 @@ model StockType {
   id   String @id @default(uuid())
   name String @unique
 
-  Stocks Stock[]
+  Stocks       Stock[]
+  StockHistory StockHistory[]
 
   @@map("stock_types")
 }
@@ -127,4 +129,17 @@ model OrderGroup {
   StockOrders StockOrder[]
 
   @@map("order_groups")
+}
+
+model StockHistory {
+  id            String   @id @default(uuid())
+  stockTypeName String   @map("stock_type_name")
+  userId        String   @map("user_id")
+  date          DateTime
+  grossValue    Decimal  @default(0) @map("gross_value") @db.Decimal(10, 2)
+
+  StockType StockType @relation(fields: [stockTypeName], references: [name])
+  User      User      @relation(fields: [userId], references: [id])
+
+  @@map("stock_histories")
 }

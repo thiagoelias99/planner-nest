@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common'
 import { StocksRepository } from './stocks.repository'
-import { Stock, StockType, StocksFromUser, StocksFromUserList } from './stock.entity'
+import { Stock, StockType, StocksFromUser, StocksFromUserList } from './entities/stock.entity'
 import { CreateStockOrderDto } from './dto/create-stock-order.dto'
 import { StockApiService } from '../../services/stock-api.service'
 import * as moment from 'moment'
+import { StockHistorySummary } from './entities/history.entity'
+
+export interface UpdateStockHistory {
+  stock: number
+  reits: number
+  internationals: number
+  cryptos: number
+  gold: number
+}
 
 @Injectable()
 export class StocksService {
@@ -203,6 +212,15 @@ export class StocksService {
       count: noZeroStocks.filter(stock => stock.ticker === 'GOLD11').length
     }
 
+    // Update History
+    await this.updateHistoryForTheMonth(userId, {
+      stock: stocks.totalAmount,
+      reits: reits.totalAmount,
+      internationals: internationals.totalAmount,
+      cryptos: cryptos.totalAmount,
+      gold: gold.totalAmount
+    })
+
     const data: StocksFromUserList = {
       count: noZeroStocks.length,
       totalAmount,
@@ -215,4 +233,64 @@ export class StocksService {
 
     return data
   }
+
+  // Atualizar historico do mes
+  async updateHistoryForTheMonth(userId: string, data: UpdateStockHistory) {
+    await this.stockRepository.updateHistoryForTheMonth(userId, data)
+  }
+
+  // Buscar historico atual do mes
+  async getCurrentHistoryFromTheMonth(userId: string, month: number, year: number): Promise<StockHistorySummary | null> {
+    // Buscar historico para cada classe de ativo
+    const stocksEnd = await this.stockRepository.getCurrentHistoryFromTheMonth(userId, month, year, 'Ação')
+    const reitsEnd = await this.stockRepository.getCurrentHistoryFromTheMonth(userId, month, year, 'FII')
+    const internationalsEnd = await this.stockRepository.getCurrentHistoryFromTheMonth(userId, month, year, 'Internacional')
+    const cryptosEnd = await this.stockRepository.getCurrentHistoryFromTheMonth(userId, month, year, 'Crypto')
+    const goldEnd = await this.stockRepository.getCurrentHistoryFromTheMonth(userId, month, year, 'Ouro')
+
+    const stocksStart = await this.stockRepository.getCurrentHistoryFromTheMonth(userId, month - 1, year, 'Ação')
+    const reitsStart = await this.stockRepository.getCurrentHistoryFromTheMonth(userId, month - 1, year, 'FII')
+    const internationalsStart = await this.stockRepository.getCurrentHistoryFromTheMonth(userId, month - 1, year, 'Internacional')
+    const cryptosStart = await this.stockRepository.getCurrentHistoryFromTheMonth(userId, month - 1, year, 'Crypto')
+    const goldStart = await this.stockRepository.getCurrentHistoryFromTheMonth(userId, month - 1, year, 'Ouro')
+
+    const totalStartAmount = Number(stocksStart.grossValue) + Number(reitsStart.grossValue) + Number(internationalsStart.grossValue) + Number(cryptosStart.grossValue) + Number(goldStart.grossValue)
+    const totalEndAmount = Number(stocksEnd.grossValue) + Number(reitsEnd.grossValue) + Number(internationalsEnd.grossValue) + Number(cryptosEnd.grossValue) + Number(goldEnd.grossValue)
+
+    return {
+      startDate: moment().set('month', month - 1).set('year', year).startOf('month').toDate(),
+      endDate: moment().set('month', month).set('year', year).endOf('month').toDate(),
+      stocks: {
+        grossValue: Number(stocksEnd.grossValue),
+        difference: Number(stocksEnd.grossValue) - Number(stocksStart.grossValue),
+        percentage: Number(stocksStart.grossValue) === 0 || Number(stocksEnd.grossValue) === 0 ? 0 : ((Number(stocksEnd.grossValue) / Number(stocksStart.grossValue)) - 1) * 100
+      },
+      reits: {
+        grossValue: Number(reitsEnd.grossValue),
+        difference: Number(reitsEnd.grossValue) - Number(reitsStart.grossValue),
+        percentage: Number(reitsStart.grossValue) === 0 || Number(reitsEnd.grossValue) === 0 ? 0 : ((Number(reitsEnd.grossValue) / Number(reitsStart.grossValue)) - 1) * 100
+      },
+      internationals: {
+        grossValue: Number(internationalsEnd.grossValue),
+        difference: Number(internationalsEnd.grossValue) - Number(internationalsStart.grossValue),
+        percentage: Number(internationalsStart.grossValue) === 0 || Number(internationalsEnd.grossValue) === 0 ? 0 : ((Number(internationalsEnd.grossValue) / Number(internationalsStart.grossValue)) - 1) * 100
+      },
+      cryptos: {
+        grossValue: Number(cryptosEnd.grossValue),
+        difference: Number(cryptosEnd.grossValue) - Number(cryptosStart.grossValue),
+        percentage: Number(cryptosStart.grossValue) === 0 || Number(cryptosEnd.grossValue) === 0 ? 0 : ((Number(cryptosEnd.grossValue) / Number(cryptosStart.grossValue)) - 1) * 100
+      },
+      gold: {
+        grossValue: Number(goldEnd.grossValue),
+        difference: Number(goldEnd.grossValue) - Number(goldStart.grossValue),
+        percentage: Number(goldStart.grossValue) === 0 || Number(goldEnd.grossValue) === 0 ? 0 : ((Number(goldEnd.grossValue) / Number(goldStart.grossValue)) - 1) * 100
+      },
+      general: {
+        grossValue: totalEndAmount,
+        difference: totalEndAmount - totalStartAmount,
+        percentage: totalStartAmount === 0 || totalEndAmount === 0 ? 0 : ((totalEndAmount / totalStartAmount) - 1) * 100
+      }
+    }
+  }
 }
+

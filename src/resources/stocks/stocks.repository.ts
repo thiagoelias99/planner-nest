@@ -1,7 +1,9 @@
+import { StockHistory } from '@prisma/client'
 import { GlobalQuote } from '../../services/stock-api.service'
 import { CreateStockOrderDto } from './dto/create-stock-order.dto'
 import { CreateStockDto } from './dto/create-stock.dto'
-import { Stock } from './stock.entity'
+import { Stock } from './entities/stock.entity'
+import { UpdateStockHistory } from './stocks.service'
 
 export interface CreateStockDtoComplete extends CreateStockDto {
   name: string
@@ -29,4 +31,6 @@ export abstract class StocksRepository {
   abstract addStockOrders(createStockOrderDto: CreateStockOrderDto): Promise<void>
   abstract getCurrentStockOrdersFromUser(userId: string): Promise<StockOrderFromUser[]>
   abstract updateStockPrice(ticker: string, data: GlobalQuote): Promise<Stock>
+  abstract getCurrentHistoryFromTheMonth(userId: string, month: number, year: number, stockTypeName: string): Promise<StockHistory>
+  abstract updateHistoryForTheMonth(userId: string, data: UpdateStockHistory): Promise<void>
 }
