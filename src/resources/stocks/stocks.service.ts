@@ -140,7 +140,7 @@ export class StocksService {
       delete stock.orderGroup
     })
 
-    // If stock latestTradingDay is 2 day ago, update from api
+    // If stock latestTradingDay is 1 day ago and after 19pm, update from api
     const today = moment()
 
     await Promise.all(
@@ -152,7 +152,8 @@ export class StocksService {
 
         const latestTradingDay = moment(stock.latestTradingDay)
         const diffDays = today.diff(latestTradingDay, 'day')
-        if (diffDays > 1) {
+        const hour = today.hour()
+        if (diffDays >= 1 && hour >= 19) {
           this.refreshStock(stock.ticker)
             .then(updatedStock => {
               if (updatedStock) {
