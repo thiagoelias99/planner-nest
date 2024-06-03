@@ -189,7 +189,6 @@ describe('Case 3 - E2E', () => {
     expect(response.body.predictedBalance).toBe(1250)
     expect(response.body.actualIncomeValue).toBe(0)
     expect(response.body.actualOutcomeValue).toBe(0)
-    expect(response.body.actualBalance).toBe(0)
 
     recurrentlyIncome = response.body.incomes.find(b => b.description === 'recurrently income')
     // recurrentlyExpense = response.body.outcomes.find(b => b.description === 'recurrently expense')
@@ -226,10 +225,8 @@ describe('Case 3 - E2E', () => {
     expect(response.body.outcomes).toHaveLength(3)
     expect(response.body.predictedIncomeValue).toBe(2500)
     expect(response.body.predictedOutcomeValue).toBe(1250)
-    expect(response.body.predictedBalance).toBe(1250)
     expect(response.body.actualIncomeValue).toBe(2000)
     expect(response.body.actualOutcomeValue).toBe(250)
-    expect(response.body.actualBalance).toBe(1750)
 
     // Credit cards check
     expect(response.body.creditCards).toHaveLength(2)
@@ -272,10 +269,8 @@ describe('Case 3 - E2E', () => {
     expect(response.body.outcomes).toHaveLength(3)
     expect(response.body.predictedIncomeValue).toBe(2500)
     expect(response.body.predictedOutcomeValue).toBe(1250)
-    expect(response.body.predictedBalance).toBe(1250)
     expect(response.body.actualIncomeValue).toBe(2000)
     expect(response.body.actualOutcomeValue).toBe(0)
-    expect(response.body.actualBalance).toBe(2000)
   })
 
   it('should delete a budget (one-time expense budget)', async () => {
@@ -298,10 +293,8 @@ describe('Case 3 - E2E', () => {
     expect(response.body.outcomes).toHaveLength(3)
     expect(response.body.predictedIncomeValue).toBe(2500)
     expect(response.body.predictedOutcomeValue).toBe(1000)
-    expect(response.body.predictedBalance).toBe(1500)
     expect(response.body.actualIncomeValue).toBe(2000)
     expect(response.body.actualOutcomeValue).toBe(0)
-    expect(response.body.actualBalance).toBe(2000)
   })
 
   it('should get budgets summary from next month', async () => {

@@ -169,21 +169,23 @@ export class BudgetsService {
     const actualCreditValue = creditCards.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
     const creditLimitValue = calculateCreditLimit(actualIncomeValue, predictedOutcomeValue, 0.25)
 
-    // Balance
-    const predictedBalance = predictedIncomeValue - predictedOutcomeValue - creditLimitValue
-    const actualBalance = actualIncomeValue - actualOutcomeValue - actualCreditValue
+    const _actualBalance = actualIncomeValue - actualOutcomeValue - actualCreditValue
 
     // Pension
     const actualPensionValue = pensions.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
-    const predictedPensionValue = calculateValueFromActualBalance(actualBalance, 0.08)
+    const predictedPensionValue = calculateValueFromActualBalance(_actualBalance, 0.08)
 
     // Investments
     const actualInvestmentsValue = investments.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
-    const predictedInvestmentsValue = calculateValueFromActualBalance(actualBalance, 0.65)
+    const predictedInvestmentsValue = calculateValueFromActualBalance(_actualBalance, 0.65)
 
     // Cash Box
     const actualCashBoxValue = cashBoxes.reduce((acc, curr) => acc + (curr.isChecked && !curr.deleted ? curr.value : 0), 0)
-    const predictedCashBoxValue = calculateValueFromActualBalance(actualBalance, 0.27)
+    const predictedCashBoxValue = calculateValueFromActualBalance(_actualBalance, 0.27)
+
+    // Balance
+    const predictedBalance = predictedIncomeValue - predictedOutcomeValue - creditLimitValue - predictedPensionValue - predictedInvestmentsValue - predictedCashBoxValue
+    const actualBalance = actualIncomeValue - actualOutcomeValue - actualCreditValue - actualPensionValue - actualInvestmentsValue - actualCashBoxValue
 
     const summary: BudgetSummary = {
       incomes,

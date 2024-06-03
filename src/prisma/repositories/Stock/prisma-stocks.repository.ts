@@ -11,9 +11,9 @@ import { getCurrentStockOrdersFromUserQuery } from './get-current-stocks-from-us
 import { GlobalQuote } from '../../../services/stock-api.service'
 import { updateStockPriceQuery } from './update-stock-price.query'
 import { StockHistory } from '@prisma/client'
-import { getCurrentHistoryFromTheMonthQuery } from './get-current-history-from-the-month-query.js'
-import { createHistoryForTheMonthQuery } from './create-history-for-the-month-query.js'
-import { UpdateStockHistory } from 'src/resources/stocks/stocks.service.js'
+import { getCurrentHistoryFromTheMonthQuery } from './get-current-history-from-the-month-query'
+import { createHistoryForTheMonthQuery } from './create-history-for-the-month-query'
+import { UpdateStockHistory } from 'src/resources/stocks/stocks.service'
 
 @Injectable()
 export class PrismaStocksRepository extends StocksRepository {
