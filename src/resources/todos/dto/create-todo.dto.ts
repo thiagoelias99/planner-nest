@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker'
 
 export class CreateTodoDto {
   @IsString() @Length(3, 30) @ApiProperty({ example: 'Wash your face' }) title: string
-  @IsString() @Length(3, 255) @IsOptional() @ApiProperty({ example: 'Wash my face at every morning' }) description?: string
+  @IsString() @Length(0, 255) @IsOptional() @ApiProperty({ example: 'Wash my face at every morning' }) description?: string
   @IsDateString() @IsOptional() @ApiProperty({ example: '1989-05-09T17:57:34.000Z' }) date: Date
 
   constructor(data: CreateTodoDto) {
